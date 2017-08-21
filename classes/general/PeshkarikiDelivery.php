@@ -119,6 +119,7 @@ Class CDeliveryAnmaslovPeshkariki
                 ),
             ),
         );
+        //AddMessage2Log($t, 'login');
 
         return $arConfig;
     }

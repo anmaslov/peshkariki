@@ -6,6 +6,8 @@
  * Date: 21.08.17
  * Time: 10:44
  */
+IncludeModuleLangFile(__FILE__);
+
 class PeshkarikiApi
 {
     const URL = 'https://api.peshkariki.ru/commonApi/';
@@ -25,14 +27,13 @@ class PeshkarikiApi
     {
         $req['login'] = $this->login;
         $req['password'] = $this->password;
-        //todo create request;
+
         $res = $this->query('login', $req);
 
-        if($res['success'] == true){
-            $this->token = $res['response']['token'];
+        if($res['SUCCESS'] == true){
+            $this->token = $res['DATA']['response']['token'];
             return $this->token;
-        }
-        else
+        }else
             return false;
     }
 
@@ -80,23 +81,20 @@ class PeshkarikiApi
     private function query($uri, $req = array())
     {
         if (!empty($req))
-            $req = json_encode($req);
+            $req = 'request=' . json_encode($req);
 
         $response = PeshkarikiCurl::request($uri, $req);
-        if ($response['success'] == false) {
-            $this->getError($response);
-            return false;
-        }else{
-            return $response;
-        }
+        return $response;
     }
 
-    private function getError($data)
+    public static function getError($errorId)
     {
-        //todo show error code and text error
+        $mess = GetMessage("ANMASLOV_PESHKARIKI_ERROR_MESSAGE_$errorId");
+        return strlen($mess)>0 ? $mess: $errorId;
     }
 
-    public static function getCityList()
+
+    /*public static function getCityList()
     {
         $cityList = [1, 2, 3, 4, 5, 6];
         foreach ($cityList as $city)
@@ -107,30 +105,37 @@ class PeshkarikiApi
             ];
         }
         return $res;
-    }
+    }*/
 }
 
 class PeshkarikiCurl
 {
     public static function request($uri, $data)
     {
-        $ch = curl_init();
+        $result = array('SUCCESS' => false, 'DATA' => GetMessage('ANMASLOV_PESHKARIKI_SOME_ERROR'));
 
-        curl_setopt ($ch, CURLOPT_URL, Peshkariki::URL . $uri);
-        curl_setopt ($ch, CURLOPT_POST, true);
-        curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        try{
+            $ch = curl_init();
 
-        //send request
-        $res = curl_exec($ch);
+            curl_setopt ($ch, CURLOPT_URL, PeshkarikiApi::URL . $uri);
+            curl_setopt ($ch, CURLOPT_POST, true);
+            curl_setopt ($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 30);
 
-        if($res === FALSE){
-            die(curl_error($ch));
+            $res = curl_exec($ch);
+            $result['DATA'] = json_decode($res, TRUE);
+
+            if($result['DATA']['success'] == false){
+                $result['DATA'] = PeshkarikiApi::getError($result['DATA']['code']);
+            }else{
+                $result['SUCCESS'] = true;
+            }
+
+        }catch (Exception $e){
+            $result['DATA'] = GetMessage('ANMASLOV_PESHKARIKI_CONNECTION_ERROR');
         }
 
-        $resData = json_decode($res, TRUE);
-
-        return $resData;
+        return $result;
     }
 }
