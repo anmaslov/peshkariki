@@ -9,6 +9,8 @@ IncludeModuleLangFile(__FILE__);
 
 Class CDeliveryAnmaslovPeshkariki
 {
+    const MODULE_ID = "anmaslov.peshkariki";
+
     function Init()
     {
         if ($arCurrency = CCurrency::GetByID('RUR')):
@@ -76,8 +78,8 @@ Class CDeliveryAnmaslovPeshkariki
 
     function Compability($arOrder, $arConfig)
     {
-        AddMessage2Log($arOrder, 'arOrder');
-        AddMessage2Log($arConfig, 'arConfig');
+        /*AddMessage2Log($arOrder, 'arOrder');
+        AddMessage2Log($arConfig, 'arConfig');*/
 
         $profile_list = array();
 
@@ -90,6 +92,9 @@ Class CDeliveryAnmaslovPeshkariki
 
     function Calculate($profile, $arConfig, $arOrder)
     {
+        $arrData = self::prepare($arOrder);
+        AddMessage2Log($arrData, "arrData");
+
         return array(
             'RESULT' => 'OK',
             'VALUE' => '4',//$response['BODY'][0],
@@ -99,5 +104,51 @@ Class CDeliveryAnmaslovPeshkariki
             'RESULT' => 'ERROR',
             'TEXT' => 'Не удалось рассчитать срок и стоимость доставки'
         );*/
+    }
+
+    function prepare($arOrder)
+    {
+        $location = CSaleLocation::GetByID($arOrder['LOCATION_TO'], LANGUAGE_ID);
+        //$location['CITY_NAME']
+
+        $arrCity = PeshkarikiApi::getCityList();
+        $cityKey = array_search($location['CITY_NAME'], $arrCity);
+        if ($cityKey == false)
+            return false;
+
+        $arrFrom = array(
+            'name' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
+            'phone' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
+            'street' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
+            'building' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
+            'apartments' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
+            'time_from' => date('Y-m-d H:i:s'),
+            'time_to' => date('Y-m-d 18:00:00', strtotime('+1 day')),
+            'items' => array(),
+        );
+
+        if (strlen($arrFrom['name'].$arrFrom['phone'].$arrFrom['street'].$arrFrom['building']) == 0)
+            return false;
+
+        $arrTo = $arrFrom;
+        $arrTo['items'] = array(
+            'name' => 'price item',
+            'price' => '100',
+            'weight' => '100',
+            'quant' => 1,
+        );
+
+        $arOrder = array(
+            'inner_id' => uniqid(),
+            'comment' => 'check price',
+            'cash' => 0,
+            'clearing' => 0,
+            'ewalletType' => 0,
+            'city_id' => $cityKey,
+            'order_type_id' => 1,
+            'route' => array($arrFrom, $arrTo)
+        );
+
+        return $arOrder;
     }
 }

@@ -99,10 +99,7 @@ class PeshkarikiApi
         $cityList = [1, 2, 3, 4, 5, 6];
         foreach ($cityList as $city)
         {
-            $res[] = [
-                'ID' => $city,
-                'NAME' => GetMessage("ANMASLOV_PESHKARIKI_CITY_$city"),
-            ];
+            $res[$city] = GetMessage("ANMASLOV_PESHKARIKI_CITY_$city");
         }
         return $res;
     }

@@ -49,13 +49,13 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
     }
     else
     {
-        foreach ($arCity as $city)
+        foreach ($arCity as $key => $city)
         {
             foreach ($arAllOptions as $option)
             {
-                $name = $option[0].$city['ID'];
+                $name = $option[0].$key;
                 $val = $_POST[$name];
-                COption::SetOptionString($module_id, $name, $val, $city['ID']. ' '. $option[1]);
+                COption::SetOptionString($module_id, $name, $val, $key. ' '. $option[1]);
             }
         }
         COption::SetOptionString($module_id, 'PROPERTY_LOGIN', $_POST['PROPERTY_LOGIN'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_LOGIN'));
@@ -106,25 +106,25 @@ $tabControl->Begin();
     <?
     $tabControl->BeginNextTab();
     ?>
-    <?foreach ($arCity as $city):?>
+    <?foreach ($arCity as $key => $city):?>
 
         <tr class="heading">
-            <td colspan="2"><b><?=$city['NAME']?></b></td>
+            <td colspan="2"><b><?=$city?></b></td>
         </tr>
 
         <?foreach ($arAllOptions as $arOption):
-            $val = COption::GetOptionString($module_id, $arOption[0].$city['ID'], '');
+            $val = COption::GetOptionString($module_id, $arOption[0].$key, '');
             ?>
             <tr>
                 <td width="30%">
-                    <label for="<?=$arOption[0].$city['ID']?>">
+                    <label for="<?=$arOption[0].$key?>">
                         <?=$arOption[1]?>:
                     </label>
                 </td>
                 <td>
-                    <input type="text" size="50" maxlength="255" id="<?=$arOption[0].$city['ID']?>"
+                    <input type="text" size="50" maxlength="255" id="<?=$arOption[0].$key?>"
                            value="<?=$val?>"
-                           name="<?=$arOption[0].$city['ID']?>" />
+                           name="<?=$arOption[0].$key?>" />
                 </td>
             </tr>
         <?endforeach;?>
