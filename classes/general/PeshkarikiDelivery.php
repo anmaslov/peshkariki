@@ -92,18 +92,29 @@ Class CDeliveryAnmaslovPeshkariki
 
     function Calculate($profile, $arConfig, $arOrder)
     {
+        $res_err = array(
+            'RESULT' => 'ERROR',
+            'TEXT' => 'Не удалось рассчитать срок и стоимость доставки'
+        );
+
         $arrData = self::prepare($arOrder);
-        AddMessage2Log($arrData, "arrData");
+        //AddMessage2Log($arrData, "arrData");
+
+        if(!$arrData)
+            return $res_err;
+
+        $pesh = new PeshkarikiApi(COption::GetOptionString(self::MODULE_ID, "PROPERTY_LOGIN", ''), COption::GetOptionString(self::MODULE_ID, "PROPERTY_PASSWORD", ''));
+        if (!$pesh->login())
+            return $res_err;
+
+        $price = $pesh->addOrder($arrData, 1);
+        if(!$price)
+            return $res_err;
 
         return array(
             'RESULT' => 'OK',
-            'VALUE' => '4',//$response['BODY'][0],
-            'TRANSIT' => '55' //$response['BODY'][1]
+            'VALUE' => $price
         );
-        /*return array(
-            'RESULT' => 'ERROR',
-            'TEXT' => 'Не удалось рассчитать срок и стоимость доставки'
-        );*/
     }
 
     function prepare($arOrder)
@@ -113,17 +124,18 @@ Class CDeliveryAnmaslovPeshkariki
 
         $arrCity = PeshkarikiApi::getCityList();
         $cityKey = array_search($location['CITY_NAME'], $arrCity);
+
         if ($cityKey == false)
             return false;
 
         $arrFrom = array(
             'name' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'phone' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'street' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'building' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'apartments' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'time_from' => date('Y-m-d H:i:s'),
-            'time_to' => date('Y-m-d 18:00:00', strtotime('+1 day')),
+            'phone' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_PHONE$cityKey", ''),
+            'street' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_STREET$cityKey", ''),
+            'building' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_BUILDING$cityKey", ''),
+            'apartments' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_APARTMENTS$cityKey", ''),
+            'time_from' => date('Y-m-d', strtotime('+1 day')) . '09:00:00',
+            'time_to' => date('Y-m-d', strtotime('+2 day')) . ' 18:00:00',
             'items' => array(),
         );
 
@@ -131,16 +143,20 @@ Class CDeliveryAnmaslovPeshkariki
             return false;
 
         $arrTo = $arrFrom;
-        $arrTo['items'] = array(
-            'name' => 'price item',
-            'price' => '100',
-            'weight' => '100',
-            'quant' => 1,
-        );
+
+        foreach($arOrder["ITEMS"] as $item) {
+            $arrTo['items'][] = array(
+                "name" => $item["NAME"],
+                "price" => round($item["PRICE"]),
+                "weight" => (intval($item["WEIGHT"])>0) ? round($item["WEIGHT"]) : '1000',
+                "quant" => $item["QUANTITY"],
+            );
+        }
 
         $arOrder = array(
             'inner_id' => uniqid(),
             'comment' => 'check price',
+            "calculate" => 1,
             'cash' => 0,
             'clearing' => 0,
             'ewalletType' => 0,

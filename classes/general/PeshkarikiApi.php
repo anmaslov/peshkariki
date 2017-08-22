@@ -15,6 +15,7 @@ class PeshkarikiApi
     private $token = '';
     private $login;
     private $password;
+    private $error;
 
     public function __construct($login, $password)
     {
@@ -35,6 +36,7 @@ class PeshkarikiApi
             return $this->token;
         }else
             return false;
+        //todo return array with error code
     }
 
     public function revokeToken()
@@ -56,9 +58,16 @@ class PeshkarikiApi
     public function addOrder($arrOrder, $calc)
     {
         $arrOrder['calculate'] = $calc;
-        $req['orders'] = $arrOrder;
+        $req['orders'] = array($arrOrder);
+        $req['token'] = $this->token;
 
-        $this->query('addOrder', $req);
+        $res = $this->query('addOrder', $req);
+
+        if($res['SUCCESS'] == true){
+            return $res['DATA']['response']['delivery_price'];
+        }else
+            return false;
+        //todo return array with error code
     }
 
     public function cancelOrder($orderId)
@@ -81,13 +90,13 @@ class PeshkarikiApi
     private function query($uri, $req = array())
     {
         if (!empty($req))
-            $req = 'request=' . json_encode($req);
+            $request = 'request=' . json_encode($req);
 
-        $response = PeshkarikiCurl::request($uri, $req);
+        $response = PeshkarikiCurl::request($uri, $request);
         return $response;
     }
 
-    public static function getError($errorId)
+    public static function getErrorMsg($errorId)
     {
         $mess = GetMessage("ANMASLOV_PESHKARIKI_ERROR_MESSAGE_$errorId");
         return strlen($mess)>0 ? $mess: $errorId;
@@ -124,7 +133,7 @@ class PeshkarikiCurl
             $result['DATA'] = json_decode($res, TRUE);
 
             if($result['DATA']['success'] == false){
-                $result['DATA'] = PeshkarikiApi::getError($result['DATA']['code']);
+                $result['DATA'] = PeshkarikiApi::getErrorMsg($result['DATA']['code']);
             }else{
                 $result['SUCCESS'] = true;
             }
