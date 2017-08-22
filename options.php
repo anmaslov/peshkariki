@@ -9,33 +9,34 @@ if (!$USER->CanDoOperation($module_id))
 }
 
 CModule::IncludeModule($module_id);
-CModule::IncludeModule("iblock");
 CModule::IncludeModule("sale");
 
 $aTabs = array(
     array("DIV" => "edit1", "TAB" => GetMessage('ANMASLOV_PESHKARIKI_OPT_TAB_PROP'), "TITLE" => GetMessage('ANMASLOV_PESHKARIKI_OPT_TAB_PROP_TITLE')),
     array("DIV" => "edit2", "TAB" => GetMessage('ANMASLOV_PESHKARIKI_OPT_TAB_CITY'), "TITLE" => GetMessage('ANMASLOV_PESHKARIKI_OPT_TAB_CITY_TITLE')),
     array("DIV" => "edit3", "TAB" => GetMessage('ANMASLOV_PESHKARIKI_OPT_TAB_ORDER'), "TITLE" => GetMessage('ANMASLOV_PESHKARIKI_OPT_TAB_ORDER_TITLE')),
-    array("DIV" => "edit4", "TAB" => GetMessage("MAIN_TAB_RIGHTS"), "TITLE" => GetMessage("MAIN_TAB_TITLE_RIGHTS")),
 );
 $tabControl = new CAdminTabControl("tabControl", $aTabs);
 
+//get statuses
 $rsStatus = CSaleStatus::GetList(array(), array("LID" => LANGUAGE_ID));
-$arrStatus = array();
 while ($arStatus = $rsStatus->Fetch())
 {
-    $arrStatus[$arStatus["ID"]] = $arStatus["NAME"];
+    $arStatuses[] = array(
+        'ID' => $arStatus["ID"],
+        'NAME' => $arStatus["NAME"]
+    );
 }
 
 $arAllOptions = Array(
-    array("PROPERTY_LOGIN", GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_LOGIN"), array("text", 50)),
-    array("PROPERTY_PASSWORD", GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_PASSWORD"), array("pwd", 50)),
-    array("PROPERTY_STATUS_ORDER", GetMessage("ANMASLOV_PESHKARIKI_OPT_STATUS_ORDER"), array("select", $arrStatus)),
-
-   /* Array("property_manager_email", GetMessage('STALL_OPT_PROP_MANAGER_EMAIL'), array("text"),
-        COption::GetOptionString("main","email_from","admin@site.com")),*/
-
+    array("PROPERTY_NAME", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_NAME")),
+    array("PROPERTY_PHONE", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_PHONE")),
+    array("PROPERTY_STREET", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_STREET")),
+    array("PROPERTY_BUILDING", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_BUILDING")),
+    array("PROPERTY_APARTAMENTS", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_APARTAMENTS")),
 );
+
+$arCity = PeshkarikiApi::getCityList();
 
 if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check_bitrix_sessid())
 {
@@ -48,83 +49,123 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
     }
     else
     {
-        foreach($arAllOptions as $arOption)
+        foreach ($arCity as $city)
         {
-            $name = $arOption[0];
-            $val = $_POST[$name];
-            if ($arOption[2][0] == "checkbox" && $val != "Y")
-                $val = "N";
-            COption::SetOptionString($module_id, $name, $val, $arOption[1]);
+            foreach ($arAllOptions as $option)
+            {
+                $name = $option[0].$city['ID'];
+                $val = $_POST[$name];
+                COption::SetOptionString($module_id, $name, $val, $city['ID']. ' '. $option[1]);
+            }
         }
-        COption::SetOptionString($module_id, 'message', $_POST['message']);
-        COption::SetOptionInt($module_id, 'iblock_id', $_POST['iblock_id']);
+        COption::SetOptionString($module_id, 'PROPERTY_LOGIN', $_POST['PROPERTY_LOGIN'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_LOGIN'));
+        COption::SetOptionString($module_id, 'PROPERTY_PASSWORD', $_POST['PROPERTY_PASSWORD'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_PASSWORD'));
+
+        $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
+        COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
+        COption::SetOptionString($module_id, 'PROPERTY_ORDER_STATUS', $_POST['PROPERTY_ORDER_STATUS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'));
     }
 }
-
-$message = COption::GetOptionString($module_id,'message', GetMessage('STALL_OPT_MESSAGE_DEFAULT'));
-$IBLOCK_ID = COption::GetOptionInt($module_id,'iblock_id', 0);
 
 $tabControl->Begin();
 ?>
 <form method="POST"
       action="<?echo $APPLICATION->GetCurPage()?>?mid=<?=htmlspecialcharsbx($mid)?>&amp;lang=<?echo LANG?>"
-      name="anmaslov.stall_settings">
+      name="anmaslov.peshkariki_settings">
 
     <?=bitrix_sessid_post();?>
     <?
-    $tabControl->BeginNextTab();
-    foreach($arAllOptions as $arOption):
-        $val = COption::GetOptionString($module_id, $arOption[0], $arOption[3]);
-        $type = $arOption[2];
-        ?>
-        <tr>
-            <td valign="top" width="50%">
-                <? echo $arOption[1];?>:
-            </td>
-            <td valign="top" width="50%">
-                <input type="text" size="<?echo $type[1]?>" maxlength="255"
-                       value="<?echo htmlspecialcharsbx($val)?>"
-                       name="<?echo htmlspecialcharsbx($arOption[0])?>" />
-            </td>
-        </tr>
-        <?
-    endforeach;
+
     $tabControl->BeginNextTab();
     ?>
 
     <tr>
-        <td width="40%"><?echo GetMessage("STALL_OPT_CHOOSE_IBLOCK") ?></td>
-        <td width="60%">
-            <?echo GetIBlockDropDownListEx(
-                $IBLOCK_ID,
-                'iblock_type_id',
-                'iblock_id',
-                array(
-                    "MIN_PERMISSION" => "X",
-                    "OPERATION" => "iblock_export",
-                ),
-                '',
-                '',
-                'class="adm-detail-iblock-types"',
-                'class="adm-detail-iblock-list"'
-            );?>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_LOGIN"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_LOGIN")?>:</label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_LOGIN', '');?>
+            <input type="text" size="30" maxlength="255" id="PROPERTY_LOGIN"
+                   value="<?=htmlspecialcharsbx($val)?>"
+                   name="PROPERTY_LOGIN" />
         </td>
     </tr>
 
     <tr>
-        <td width="30%" valign="top"><?echo GetMessage('STALL_OPT_MESSAGE')?>: </td>
-        <td width="70%"><textarea cols="50" rows="7" name="message"><?echo htmlspecialcharsbx($message)?></textarea></td>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_PASSWORD"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_PASSWORD")?>:</label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_PASSWORD', '');?>
+            <input type="password" size="30" maxlength="255" id="PROPERTY_PASSWORD"
+                   value="<?=htmlspecialcharsbx($val)?>"
+                   name="PROPERTY_PASSWORD" />
+        </td>
     </tr>
+
     <?
     $tabControl->BeginNextTab();
     ?>
-    <tr>
-        <td width="30%">checkbox to add order</td>
-        <td>Checbox and combobox</td>
-    </tr>
+    <?foreach ($arCity as $city):?>
+
+        <tr class="heading">
+            <td colspan="2"><b><?=$city['NAME']?></b></td>
+        </tr>
+
+        <?foreach ($arAllOptions as $arOption):
+            $val = COption::GetOptionString($module_id, $arOption[0].$city['ID'], '');
+            ?>
+            <tr>
+                <td width="30%">
+                    <label for="<?=$arOption[0].$city['ID']?>">
+                        <?=$arOption[1]?>:
+                    </label>
+                </td>
+                <td>
+                    <input type="text" size="50" maxlength="255" id="<?=$arOption[0].$city['ID']?>"
+                           value="<?=$val?>"
+                           name="<?=$arOption[0].$city['ID']?>" />
+                </td>
+            </tr>
+        <?endforeach;?>
+
+    <?endforeach;?>
+
     <?
     $tabControl->BeginNextTab();
-    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/admin/group_rights2.php");
+    ?>
+
+    <tr class="heading">
+        <td colspan="2"><b><? echo GetMessage("ANMASLOV_PESHKARIKI_OPT_TAB_ORDER_TITLE") ?></b></td>
+    </tr>
+
+    <tr>
+        <td width="30%">
+            <label for="make_order"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER") ?></label>
+        </td>
+        <td>
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_MAKE_ORDER', '');?>
+            <input type="checkbox" name="PROPERTY_MAKE_ORDER" id="make_order" value="Y" <?=($val == 'Y' ?' checked':'')?>>
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%">
+            <label for="ORDER_STATUS">
+                <?=GetMessage("ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS") ?>
+            </label>
+        </td>
+        <td>
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_ORDER_STATUS', '');?>
+            <select name="PROPERTY_ORDER_STATUS" id="ORDER_STATUS">
+                <?foreach ($arStatuses as $arStatus):?>
+                    <?='<option value="' . htmlspecialcharsbx($arStatus['ID']) . '" ' . (($arStatus['ID'] == htmlspecialcharsbx($val)) ? 'selected="selected"' : '') . '>' . htmlspecialcharsbx($arStatus['NAME']) . '</option>'?>
+                <?endforeach;?>
+            </select>
+        </td>
+    </tr>
+
+    <?
     $tabControl->Buttons();?>
     <script language="JavaScript">
         function confirmRestoreDefaults()

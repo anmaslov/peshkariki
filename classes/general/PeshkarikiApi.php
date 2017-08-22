@@ -94,7 +94,7 @@ class PeshkarikiApi
     }
 
 
-    /*public static function getCityList()
+    public static function getCityList()
     {
         $cityList = [1, 2, 3, 4, 5, 6];
         foreach ($cityList as $city)
@@ -105,7 +105,7 @@ class PeshkarikiApi
             ];
         }
         return $res;
-    }*/
+    }
 }
 
 class PeshkarikiCurl
