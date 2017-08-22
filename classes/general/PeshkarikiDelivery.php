@@ -61,71 +61,24 @@ Class CDeliveryAnmaslovPeshkariki
         $arConfig = array(
             'CONFIG_GROUPS' => array(
                 'delivery' => GetMessage('ANMASLOV_PESHKARIKI_CONFIG_DELIVERY_TITLE'),
-                'city' => GetMessage('ANMASLOV_PESHKARIKI_CONFIG_CITY_TITLE')
             ),
 
             'CONFIG' => array(
-                //Settings api
                 'HEADER_API_SETTINGS' => array(
                     'TYPE' => 'SECTION',
                     'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_TITLE_API_SECTION_HEADER'),
                     'GROUP' => 'delivery'
-                ),
-                'LOGIN' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_LOGIN'),
-                    'DEFAULT' => '',
-                    'GROUP' => 'delivery',
-                    'SIZE' => '50'
-                ),
-                'PASSWORD' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_PASSWORD'),
-                    'DEFAULT' => '',
-                    'GROUP' => 'delivery',
-                    'SIZE' => '50'
-                ),
-
-                
-                'HEADER_DELIVERY_CITY_MOSCOW' => array(
-                    'TYPE' => 'SECTION',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_TITLE_DELIVERY_MOSCOW'),
-                    'GROUP' => 'city'
-                ),
-                'MOSCOW_NAME' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_NAME'),
-                    'GROUP' => 'city',
-                ),
-                'MOSCOW_PHONE' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_PHONE'),
-                    'GROUP' => 'city',
-                ),
-                'MOSCOW_STREET' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_STREET'),
-                    'GROUP' => 'city',
-                ),
-                'MOSCOW_BUILDING' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_BUILDING'),
-                    'GROUP' => 'city',
-                ),
-                'MOSCOW_APARTAMENTS' => array(
-                    'TYPE' => 'STRING',
-                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_SETTINGS_APARTAMENTS'),
-                    'GROUP' => 'city',
-                ),
+                )
             ),
         );
-        //AddMessage2Log($t, 'login');
-
         return $arConfig;
     }
 
     function Compability($arOrder, $arConfig)
     {
+        AddMessage2Log($arOrder, 'arOrder');
+        AddMessage2Log($arConfig, 'arConfig');
+
         $profile_list = array();
 
         if (true) {
@@ -139,8 +92,8 @@ Class CDeliveryAnmaslovPeshkariki
     {
         return array(
             'RESULT' => 'OK',
-            'VALUE' => $response['BODY'][0],
-            'TRANSIT' => $response['BODY'][1]
+            'VALUE' => '4',//$response['BODY'][0],
+            'TRANSIT' => '55' //$response['BODY'][1]
         );
         /*return array(
             'RESULT' => 'ERROR',

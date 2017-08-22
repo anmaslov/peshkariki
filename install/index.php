@@ -34,6 +34,10 @@ Class anmaslov_peshkariki extends CModule
     {
         RegisterModuleDependences("sale", "onSaleDeliveryHandlersBuildList",
             $this->MODULE_ID, "CDeliveryAnmaslovPeshkariki", "Init");
+
+        RegisterModuleDependences("sale", "OnSaleStatusOrder",
+            $this->MODULE_ID, "COrderAnmaslovPeshkariki", "addOrder");
+
         return true;
     }
 
@@ -41,6 +45,10 @@ Class anmaslov_peshkariki extends CModule
     {
         UnRegisterModuleDependences("sale", "onSaleDeliveryHandlersBuildList",
             $this->MODULE_ID, "CDeliveryAnmaslovPeshkariki", "Init");
+
+        UnRegisterModuleDependences("sale", "OnSaleStatusOrder",
+            $this->MODULE_ID, "COrderAnmaslovPeshkariki", "addOrder");
+
         return true;
     }
 

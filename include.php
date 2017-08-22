@@ -6,6 +6,7 @@ CModule::AddAutoloadClasses(
     $module_id,
     array(
         "PeshkarikiAPI" => "classes/general/PeshkarikiApi.php",
-        "CDeliveryAnmaslovPeshkariki" => "classes/general/PeshkarikiDelivery.php"
+        "CDeliveryAnmaslovPeshkariki" => "classes/general/PeshkarikiDelivery.php",
+        "COrderAnmaslovPeshkariki" => "classes/general/PeshkarikiOrder.php",
     )
 );
