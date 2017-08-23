@@ -92,28 +92,36 @@ Class CDeliveryAnmaslovPeshkariki
 
     function Calculate($profile, $arConfig, $arOrder)
     {
+        //todo write error log
+
         $res_err = array(
             'RESULT' => 'ERROR',
             'TEXT' => 'Не удалось рассчитать срок и стоимость доставки'
         );
 
         $arrData = self::prepare($arOrder);
-        //AddMessage2Log($arrData, "arrData");
 
         if(!$arrData)
             return $res_err;
 
-        $pesh = new PeshkarikiApi(COption::GetOptionString(self::MODULE_ID, "PROPERTY_LOGIN", ''), COption::GetOptionString(self::MODULE_ID, "PROPERTY_PASSWORD", ''));
-        if (!$pesh->login())
+        $pesh = new PeshkarikiApi(
+            COption::GetOptionString(self::MODULE_ID, "PROPERTY_LOGIN", ''),
+            COption::GetOptionString(self::MODULE_ID, "PROPERTY_PASSWORD", '') );
+
+        $token = $pesh->login();
+        AddMessage2Log($token, "token");
+        if ($token['SUCCESS'] == false)
             return $res_err;
 
-        $price = $pesh->addOrder($arrData, 1);
-        if(!$price)
+        $price = $pesh->addOrder($arrData, $pesh::CALCULATE);
+        AddMessage2Log($price, "price");
+
+        if($price['SUCCESS'] == false)
             return $res_err;
 
         return array(
             'RESULT' => 'OK',
-            'VALUE' => $price
+            'VALUE' => $price['DATA']
         );
     }
 
@@ -134,7 +142,7 @@ Class CDeliveryAnmaslovPeshkariki
             'street' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_STREET$cityKey", ''),
             'building' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_BUILDING$cityKey", ''),
             'apartments' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_APARTMENTS$cityKey", ''),
-            'time_from' => date('Y-m-d', strtotime('+1 day')) . '09:00:00',
+            'time_from' => date('Y-m-d', strtotime('+1 day')) . ' 09:00:00',
             'time_to' => date('Y-m-d', strtotime('+2 day')) . ' 18:00:00',
             'items' => array(),
         );

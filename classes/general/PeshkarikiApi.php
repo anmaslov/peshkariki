@@ -11,6 +11,7 @@ IncludeModuleLangFile(__FILE__);
 class PeshkarikiApi
 {
     const URL = 'https://api.peshkariki.ru/commonApi/';
+    const CALCULATE = 1;
 
     private $token = '';
     private $login;
@@ -31,12 +32,12 @@ class PeshkarikiApi
 
         $res = $this->query('login', $req);
 
-        if($res['SUCCESS'] == true){
+        if($res['SUCCESS'] == true) {
             $this->token = $res['DATA']['response']['token'];
-            return $this->token;
-        }else
-            return false;
-        //todo return array with error code
+            $res['DATA'] = $this->token;
+        }
+
+        return $res;
     }
 
     public function revokeToken()
@@ -55,7 +56,7 @@ class PeshkarikiApi
         //todo make method
     }
 
-    public function addOrder($arrOrder, $calc)
+    public function addOrder($arrOrder, $calc = 0)
     {
         $arrOrder['calculate'] = $calc;
         $req['orders'] = array($arrOrder);
@@ -63,11 +64,10 @@ class PeshkarikiApi
 
         $res = $this->query('addOrder', $req);
 
-        if($res['SUCCESS'] == true){
-            return $res['DATA']['response']['delivery_price'];
-        }else
-            return false;
-        //todo return array with error code
+        if($res['SUCCESS'] == true)
+            $res['DATA'] = $res['DATA']['response']['delivery_price'];
+
+        return $res;
     }
 
     public function cancelOrder($orderId)
@@ -129,7 +129,16 @@ class PeshkarikiCurl
             curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 30);
 
+            //https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
             $res = curl_exec($ch);
+
+            if($res == false){
+                $result['DATA'] = curl_error($ch);
+                return $result;
+            }
+
             $result['DATA'] = json_decode($res, TRUE);
 
             if($result['DATA']['success'] == false){
