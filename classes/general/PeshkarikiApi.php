@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Maslov Alexey
- * Date: 21.08.17
- * Time: 10:44
- */
 IncludeModuleLangFile(__FILE__);
 
 class PeshkarikiApi

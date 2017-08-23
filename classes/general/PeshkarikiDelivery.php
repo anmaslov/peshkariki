@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Maslov Alexey
- * Date: 21.08.17
- * Time: 12:10
- */
+
 IncludeModuleLangFile(__FILE__);
 
 Class CDeliveryAnmaslovPeshkariki
