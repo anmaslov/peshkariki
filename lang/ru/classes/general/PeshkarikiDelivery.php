@@ -8,3 +8,5 @@ $MESS['ANMASLOV_PESHKARIKI_COURIER_DESCRIPTION'] = 'Профиль достав�
 
 $MESS['ANMASLOV_PESHKARIKI_CONFIG_DELIVERY_TITLE'] = 'Настройки доставки';
 $MESS['ANMASLOV_PESHKARIKI_TITLE_API_SECTION_HEADER'] = '<a href="/bitrix/admin/settings.php?mid=anmaslov.peshkariki&mid_menu=1" target="_blank">Настройки API</a>';
+
+$MESS['ANMASLOV_PESHKARIKI_TEXT_ERROR'] = 'Не удалось рассчитать срок и стоимость доставки';

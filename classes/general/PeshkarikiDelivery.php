@@ -78,12 +78,10 @@ Class CDeliveryAnmaslovPeshkariki
 
     function Compability($arOrder, $arConfig)
     {
-        /*AddMessage2Log($arOrder, 'arOrder');
-        AddMessage2Log($arConfig, 'arConfig');*/
+        $response = self::__calc($arOrder, $arConfig);
 
         $profile_list = array();
-
-        if (true) {
+        if ($response['RESULT'] == 'OK') {
             $profile_list[] = 'courier';
         }
 
@@ -92,37 +90,66 @@ Class CDeliveryAnmaslovPeshkariki
 
     function Calculate($profile, $arConfig, $arOrder)
     {
+        $response = self::__calc($arOrder, $arConfig);
+
+        if ($response['RESULT'] == 'OK') {
+            return array(
+                'RESULT' => 'OK',
+                'VALUE' => $response['TEXT']
+            );
+        }
+
+        return array(
+            'RESULT' => 'ERROR',
+            'TEXT' => $response['TEXT']
+        );
+    }
+
+    function __calc($arOrder, $arConfig)
+    {
         //todo write error log
 
-        $res_err = array(
-            'RESULT' => 'ERROR',
-            'TEXT' => 'Не удалось рассчитать срок и стоимость доставки'
-        );
+        $result = array('RESULT' => 'ERROR', 'TEXT' => GetMessage('ANMASLOV_PESHKARIKI_TEXT_ERROR'));
+        $arData = self::prepare($arOrder);
 
-        $arrData = self::prepare($arOrder);
+        if(!$arData)
+            return $result;
 
-        if(!$arrData)
-            return $res_err;
+        $obCache = new CPHPCache();
+        $cache_time = 10*60;
+        $cache_id = 'ANMASLOV_PESHKARIKI_RUS|'.$arOrder['LOCATION_TO'].'|'.$arOrder['WEIGHT'];
 
-        $pesh = new PeshkarikiApi(
+        if ($obCache->InitCache($cache_time, $cache_id, "/")){
+            $cache_data = $obCache->GetVars();
+            return $cache_data['VALUE'];
+        }
+
+        $pa = new PeshkarikiApi(
             COption::GetOptionString(self::MODULE_ID, "PROPERTY_LOGIN", ''),
             COption::GetOptionString(self::MODULE_ID, "PROPERTY_PASSWORD", '') );
 
-        $token = $pesh->login();
-        AddMessage2Log($token, "token");
+        //get token
+        $token = $pa->login();
         if ($token['SUCCESS'] == false)
-            return $res_err;
+        {
+            $result['TEXT'] = $token['DATA'];
+            return $result;
+        }
 
-        $price = $pesh->addOrder($arrData, $pesh::CALCULATE);
-        AddMessage2Log($price, "price");
+        //get price
+        $price = $pa->addOrder($arData, $pa::CALCULATE);
+        if($price['SUCCESS'] == false){
+            $result['TEXT'] = $token['DATA'];
+            return $result;
+        }
 
-        if($price['SUCCESS'] == false)
-            return $res_err;
+        $result['RESULT'] = 'OK';
+        $result['TEXT'] = $price['DATA'];
 
-        return array(
-            'RESULT' => 'OK',
-            'VALUE' => $price['DATA']
-        );
+        $obCache->StartDataCache($cache_time, $cache_id);
+        $obCache->EndDataCache(array('VALUE' => $result));
+
+        return $result;
     }
 
     function prepare($arOrder)
