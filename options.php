@@ -61,6 +61,9 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
         COption::SetOptionString($module_id, 'PROPERTY_LOGIN', $_POST['PROPERTY_LOGIN'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_LOGIN'));
         COption::SetOptionString($module_id, 'PROPERTY_PASSWORD', $_POST['PROPERTY_PASSWORD'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_PASSWORD'));
 
+        $chBxLog = ($_POST['PROPERTY_MAKE_LOG'] == 'Y' ? 'Y' : 'N');
+        COption::SetOptionString($module_id, 'PROPERTY_MAKE_LOG', $chBxLog, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_LOG'));
+
         $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_STATUS', $_POST['PROPERTY_ORDER_STATUS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'));
@@ -103,6 +106,16 @@ $tabControl->Begin();
             <input type="password" size="30" maxlength="255" id="PROPERTY_PASSWORD"
                    value="<?=htmlspecialcharsbx($val)?>"
                    name="PROPERTY_PASSWORD" />
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%">
+            <label for="make_log"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_MAKE_LOG") ?></label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_MAKE_LOG', 'N');?>
+            <input type="checkbox" name="PROPERTY_MAKE_LOG" id="make_log" value="Y" <?=($val == 'Y' ?' checked':'')?>>
         </td>
     </tr>
 

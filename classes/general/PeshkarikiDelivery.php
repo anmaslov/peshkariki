@@ -127,6 +127,7 @@ Class CDeliveryAnmaslovPeshkariki
         $token = $pa->login();
         if ($token['SUCCESS'] == false)
         {
+            CUtilsPeshkariki::addLog($token, 'login', 'ERROR');
             $result['TEXT'] = $token['DATA'];
             return $result;
         }
@@ -134,7 +135,8 @@ Class CDeliveryAnmaslovPeshkariki
         //get price
         $price = $pa->addOrder($arData, $pa::CALCULATE);
         if($price['SUCCESS'] == false){
-            $result['TEXT'] = $token['DATA'];
+            CUtilsPeshkariki::addLog($price, 'get_price', 'ERROR');
+            $result['TEXT'] = $price['DATA'];
             return $result;
         }
 

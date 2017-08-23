@@ -8,5 +8,6 @@ CModule::AddAutoloadClasses(
         "PeshkarikiAPI" => "classes/general/PeshkarikiApi.php",
         "CDeliveryAnmaslovPeshkariki" => "classes/general/PeshkarikiDelivery.php",
         "COrderAnmaslovPeshkariki" => "classes/general/PeshkarikiOrder.php",
+        "CUtilsPeshkariki" => "classes/general/Utils.php",
     )
 );

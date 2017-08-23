@@ -6,8 +6,6 @@ class COrderAnmaslovPeshkariki{
 
     public static function addOrder($id, $arFields)
     {
-        //todo add log
-
         $propMakeOrder = COption::GetOptionString(self::MODULE_ID, "PROPERTY_MAKE_ORDER", 'N');
         $propOrderStatus = COption::GetOptionString(self::MODULE_ID, "PROPERTY_ORDER_STATUS", 'F');
 
@@ -44,6 +42,7 @@ class COrderAnmaslovPeshkariki{
             return;
 
         $price = $pa->addOrder($arData);
+        CUtilsPeshkariki::addLog($price, 'add_new_order', 'INFO');
         return $price;
     }
 

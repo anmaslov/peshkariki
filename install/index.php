@@ -38,6 +38,9 @@ Class anmaslov_peshkariki extends CModule
         RegisterModuleDependences("sale", "OnSaleStatusOrder",
             $this->MODULE_ID, "COrderAnmaslovPeshkariki", "addOrder");
 
+        RegisterModuleDependences("main", "OnEventLogGetAuditTypes",
+            $this->MODULE_ID, "CUtilsPeshkariki", "ASD_OnEventLogGetAuditTypes");
+
         return true;
     }
 
@@ -48,6 +51,9 @@ Class anmaslov_peshkariki extends CModule
 
         UnRegisterModuleDependences("sale", "OnSaleStatusOrder",
             $this->MODULE_ID, "COrderAnmaslovPeshkariki", "addOrder");
+
+        UnRegisterModuleDependences("main", "OnEventLogGetAuditTypes",
+            $this->MODULE_ID, "CUtilsPeshkariki", "ASD_OnEventLogGetAuditTypes");
 
         return true;
     }
