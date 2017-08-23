@@ -4,10 +4,9 @@ class COrderAnmaslovPeshkariki{
 
     const MODULE_ID = 'anmaslov.peshkariki';
 
-
     public static function addOrder($id, $arFields)
     {
-        //AddMessage2Log($id, "id"); orderId
+        //todo add log
 
         $propMakeOrder = COption::GetOptionString(self::MODULE_ID, "PROPERTY_MAKE_ORDER", 'N');
         $propOrderStatus = COption::GetOptionString(self::MODULE_ID, "PROPERTY_ORDER_STATUS", 'F');
@@ -45,7 +44,7 @@ class COrderAnmaslovPeshkariki{
             return;
 
         $price = $pa->addOrder($arData);
-        var_dump($price);
+        return $price;
     }
 
     public static function prepareData($arData)
