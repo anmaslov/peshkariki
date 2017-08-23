@@ -50,6 +50,7 @@ class PeshkarikiApi
         //todo make method
     }
 
+    //$calc = 1 - only price
     public function addOrder($arrOrder, $calc = 0)
     {
         $arrOrder['calculate'] = $calc;
@@ -58,8 +59,10 @@ class PeshkarikiApi
 
         $res = $this->query('addOrder', $req);
 
-        if($res['SUCCESS'] == true)
-            $res['DATA'] = $res['DATA']['response']['delivery_price'];
+        if($res['SUCCESS'] == true){
+            if ($calc)
+                $res['DATA'] = $res['DATA']['response']['delivery_price'];
+        }
 
         return $res;
     }
