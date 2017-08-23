@@ -76,7 +76,7 @@ class COrderAnmaslovPeshkariki{
 
         $arOrder = array(
             'inner_id' => $arData['ORDER_ID'],
-            'comment' => GetMessage('ANMASLOV_PESHKARIKI_COMMENT'),
+            'comment' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_ORDER_COMMENT", ''),
             "calculate" => 0,
             'cash' => 0,
             'clearing' => 0,

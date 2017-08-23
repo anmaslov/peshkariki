@@ -64,6 +64,9 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
         $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_STATUS', $_POST['PROPERTY_ORDER_STATUS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'));
+
+        COption::SetOptionString($module_id, 'PROPERTY_ORDER_COMMENT', $_POST['PROPERTY_ORDER_COMMENT'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT'));
+
     }
 }
 
@@ -162,6 +165,18 @@ $tabControl->Begin();
                     <?='<option value="' . htmlspecialcharsbx($arStatus['ID']) . '" ' . (($arStatus['ID'] == htmlspecialcharsbx($val)) ? 'selected="selected"' : '') . '>' . htmlspecialcharsbx($arStatus['NAME']) . '</option>'?>
                 <?endforeach;?>
             </select>
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%">
+            <label for="order_comment"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT") ?></label>
+        </td>
+        <td>
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_ORDER_COMMENT', '');?>
+            <input type="text" size="30" maxlength="255" id="order_comment"
+                   value="<?=htmlspecialcharsbx($val)?>"
+                   name="PROPERTY_ORDER_COMMENT" />
         </td>
     </tr>
 

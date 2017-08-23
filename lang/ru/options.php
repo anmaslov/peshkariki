@@ -12,6 +12,7 @@ $MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_PASSWORD'] = "Пароль в систем�
 
 $MESS ['ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'] = "Автоматически формировать заказ в системе Пешкарики";
 $MESS ['ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'] = "Статус заказа, при кототором формировать запрос";
+$MESS ['ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT'] = "Краткое описание заказа (для курьера)";
 
 $MESS['ANMASLOV_PESHKARIKI_SETTINGS_NAME'] = 'ФИО контактного лица';
 $MESS['ANMASLOV_PESHKARIKI_SETTINGS_PHONE'] = 'Телефон контактного лица';
