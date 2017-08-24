@@ -125,11 +125,12 @@ class COrderAnmaslovPeshkariki{
         );
 
         $arRouteItems = array();
+        $defaultWeight = CUtilsPeshkariki::getConfig("PROPERTY_WEIGHT", 10);
         while ($arItems = $dbItems->Fetch()) {
             $arRouteItems[] = array(
                 'name' => CUtilsPeshkariki::toUtf($arItems['NAME']),
                 'price' => round($arItems['PRICE']),
-                'weight' => (intval($arItems['WEIGHT']) > 0 ? round($arItems['WEIGHT']) : '1'),
+                'weight' => (intval($arItems['WEIGHT']) > 10 ? round($arItems['WEIGHT']) : $defaultWeight),
                 'quant' => $arItems['QUANTITY'],
             );
         }

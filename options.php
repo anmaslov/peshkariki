@@ -64,6 +64,9 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
         $chBxLog = ($_POST['PROPERTY_MAKE_LOG'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_LOG', $chBxLog, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_LOG'));
 
+        $weight = (intval($_POST['PROPERTY_WEIGHT']) < 10 ? 10 : intval($_POST['PROPERTY_WEIGHT']));
+        COption::SetOptionInt($module_id, 'PROPERTY_WEIGHT', $weight, GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT'));
+
         $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_STATUS', $_POST['PROPERTY_ORDER_STATUS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'));
@@ -116,6 +119,18 @@ $tabControl->Begin();
         <td width="70%">
             <? $val = COption::GetOptionString($module_id,'PROPERTY_MAKE_LOG', 'N');?>
             <input type="checkbox" name="PROPERTY_MAKE_LOG" id="make_log" value="Y" <?=($val == 'Y' ?' checked':'')?>>
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_LOGIN"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT")?>:</label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionInt($module_id,'PROPERTY_WEIGHT', 10);?>
+            <input type="text" size="30" maxlength="255" id="PROPERTY_WEIGH"
+                   value="<?=htmlspecialcharsbx($val)?>"
+                   name="PROPERTY_WEIGHT" />
         </td>
     </tr>
 

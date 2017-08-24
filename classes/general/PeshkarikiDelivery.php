@@ -177,11 +177,12 @@ Class CDeliveryAnmaslovPeshkariki
 
         $arrTo = $arrFrom;
 
+        $defaultWeight = CUtilsPeshkariki::getConfig("PROPERTY_WEIGHT", 10);
         foreach($arOrder["ITEMS"] as $item) {
             $arrTo['items'][] = array(
                 "name" => CUtilsPeshkariki::toUtf($item["NAME"]),
                 "price" => round($item["PRICE"]),
-                "weight" => (intval($item["WEIGHT"])>0) ? round($item["WEIGHT"]) : '1000',
+                "weight" => (intval($item["WEIGHT"])>10) ? round($item["WEIGHT"]) : $defaultWeight,
                 "quant" => $item["QUANTITY"],
             );
         }
