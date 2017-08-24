@@ -102,8 +102,6 @@ Class CDeliveryAnmaslovPeshkariki
 
     function __calc($arOrder, $arConfig)
     {
-        //todo write error log
-
         $result = array('RESULT' => 'ERROR', 'TEXT' => GetMessage('ANMASLOV_PESHKARIKI_TEXT_ERROR'));
         $arData = self::prepare($arOrder);
 
@@ -120,8 +118,9 @@ Class CDeliveryAnmaslovPeshkariki
         }
 
         $pa = new PeshkarikiApi(
-            COption::GetOptionString(self::MODULE_ID, "PROPERTY_LOGIN", ''),
-            COption::GetOptionString(self::MODULE_ID, "PROPERTY_PASSWORD", '') );
+            CUtilsPeshkariki::getConfig("PROPERTY_LOGIN"),
+            CUtilsPeshkariki::getConfig("PROPERTY_PASSWORD")
+        );
 
         //get token
         $token = $pa->login();
@@ -161,11 +160,11 @@ Class CDeliveryAnmaslovPeshkariki
             return false;
 
         $arrFrom = array(
-            'name' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'phone' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_PHONE$cityKey", ''),
-            'street' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_STREET$cityKey", ''),
-            'building' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_BUILDING$cityKey", ''),
-            'apartments' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_APARTMENTS$cityKey", ''),
+            'name' => CUtilsPeshkariki::getConfig("PROPERTY_NAME$cityKey"),
+            'phone' => CUtilsPeshkariki::getConfig("PROPERTY_PHONE$cityKey"),
+            'street' => CUtilsPeshkariki::getConfig("PROPERTY_STREET$cityKey"),
+            'building' => CUtilsPeshkariki::getConfig("PROPERTY_BUILDING$cityKey"),
+            'apartments' => CUtilsPeshkariki::getConfig("PROPERTY_APARTMENTS$cityKey"),
             'time_from' => date('Y-m-d', strtotime('+1 day')) . ' 09:00:00',
             'time_to' => date('Y-m-d', strtotime('+2 day')) . ' 18:00:00',
             'items' => array(),
@@ -178,7 +177,7 @@ Class CDeliveryAnmaslovPeshkariki
 
         foreach($arOrder["ITEMS"] as $item) {
             $arrTo['items'][] = array(
-                "name" => $item["NAME"],
+                "name" => CUtilsPeshkariki::toUtf($item["NAME"]),
                 "price" => round($item["PRICE"]),
                 "weight" => (intval($item["WEIGHT"])>0) ? round($item["WEIGHT"]) : '1000',
                 "quant" => $item["QUANTITY"],

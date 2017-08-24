@@ -2,6 +2,8 @@
 
 class CUtilsPeshkariki
 {
+    const MODULE_ID = "anmaslov.peshkariki";
+
     public static function addLog($data, $object = 'anmaslov.peshkariki', $severity = 'DEBUG')
     {
         $isLog = COption::GetOptionString(COrderAnmaslovPeshkariki::MODULE_ID, 'PROPERTY_MAKE_LOG', 'N');
@@ -19,6 +21,20 @@ class CUtilsPeshkariki
                 "DESCRIPTION" => $data,
             ));
         }
+    }
+
+    public static function toUtf($str)
+    {
+        if (defined('BX_UTF')) {
+            return $str;
+        }else{
+            return mb_convert_encoding($str, 'utf-8', 'windows-1251');
+        }
+    }
+
+    public static function getConfig($configStr)
+    {
+        return self::toUtf(COption::GetOptionString(self::MODULE_ID, $configStr));
     }
 
     public function ASD_OnEventLogGetAuditTypes()

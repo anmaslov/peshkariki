@@ -14,3 +14,4 @@ $MESS['ANMASLOV_PESHKARIKI_ERROR_MESSAGE_11'] = 'В запросе нет обя
 $MESS['ANMASLOV_PESHKARIKI_ERROR_MESSAGE_12'] = 'Истекло время жизни токена';
 $MESS['ANMASLOV_PESHKARIKI_ERROR_MESSAGE_13'] = 'Пользователь не найден';
 $MESS['ANMASLOV_PESHKARIKI_ERROR_MESSAGE_14'] = 'Пароль неверный';
+$MESS['ANMASLOV_PESHKARIKI_ERROR_MESSAGE_22'] = 'Ошибка в товарах';
