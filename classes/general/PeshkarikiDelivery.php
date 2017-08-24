@@ -108,7 +108,11 @@ Class CDeliveryAnmaslovPeshkariki
 
         $obCache = new CPHPCache();
         $cache_time = 10*60;
-        $cache_id = 'ANMASLOV_PESHKARIKI_RUS|'.$arOrder['LOCATION_TO'].'|'.$arOrder['WEIGHT'];
+        $arItemsId = array_column($arOrder["ITEMS"], 'ID');
+        $cache_id = 'ANMASLOV_PESHKARIKI_RUS|'.$arOrder['LOCATION_TO'].'|'.$arOrder['WEIGHT'].'|'.serialize($arItemsId);
+
+        AddMessage2Log($cache_id, 'cashe_id');
+
 
         if ($obCache->InitCache($cache_time, $cache_id, "/")){
             $cache_data = $obCache->GetVars();
