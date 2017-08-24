@@ -1,5 +1,7 @@
 <?php
 
+IncludeModuleLangFile(__FILE__);
+
 class CUtilsPeshkariki
 {
     const MODULE_ID = "anmaslov.peshkariki";

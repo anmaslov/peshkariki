@@ -1,5 +1,7 @@
 <?php
 
+IncludeModuleLangFile(__FILE__);
+
 class COrderAnmaslovPeshkariki{
 
     const MODULE_ID = 'anmaslov.peshkariki';
@@ -97,6 +99,9 @@ class COrderAnmaslovPeshkariki{
         while ($arVals = $dbProp->GetNext()) {
             switch ($arVals['CODE']) {
                 case 'FIO':
+                    $arProp['name'] = CUtilsPeshkariki::toUtf($arVals['VALUE']);
+                    break;
+                case 'CONTACT_PERSON':
                     $arProp['name'] = CUtilsPeshkariki::toUtf($arVals['VALUE']);
                     break;
                 case 'PHONE':
