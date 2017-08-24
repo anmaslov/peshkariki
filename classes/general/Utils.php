@@ -6,7 +6,7 @@ class CUtilsPeshkariki
 
     public static function addLog($data, $object = 'anmaslov.peshkariki', $severity = 'DEBUG')
     {
-        $isLog = COption::GetOptionString(COrderAnmaslovPeshkariki::MODULE_ID, 'PROPERTY_MAKE_LOG', 'N');
+        $isLog = COption::GetOptionString(self::MODULE_ID, 'PROPERTY_MAKE_LOG', 'N');
 
         if ($isLog == 'Y'){
 
@@ -16,7 +16,7 @@ class CUtilsPeshkariki
             CEventLog::Add(array(
                 "SEVERITY" => $severity,
                 "AUDIT_TYPE_ID" => "PESHKARIKI_TYPE",
-                "MODULE_ID" => COrderAnmaslovPeshkariki::MODULE_ID,
+                "MODULE_ID" => self::MODULE_ID,
                 "ITEM_ID" => $object,
                 "DESCRIPTION" => $data,
             ));
@@ -32,9 +32,9 @@ class CUtilsPeshkariki
         }
     }
 
-    public static function getConfig($configStr)
+    public static function getConfig($configStr, $default = '')
     {
-        return self::toUtf(COption::GetOptionString(self::MODULE_ID, $configStr));
+        return self::toUtf(COption::GetOptionString(self::MODULE_ID, $configStr, $default));
     }
 
     public function ASD_OnEventLogGetAuditTypes()

@@ -4,8 +4,6 @@ IncludeModuleLangFile(__FILE__);
 
 Class CDeliveryAnmaslovPeshkariki
 {
-    const MODULE_ID = "anmaslov.peshkariki";
-
     function Init()
     {
         if ($arCurrency = CCurrency::GetByID('RUR')):

@@ -6,8 +6,9 @@ class COrderAnmaslovPeshkariki{
 
     public static function addOrder($id, $arFields)
     {
-        $propMakeOrder = COption::GetOptionString(self::MODULE_ID, "PROPERTY_MAKE_ORDER", 'N');
-        $propOrderStatus = COption::GetOptionString(self::MODULE_ID, "PROPERTY_ORDER_STATUS", 'F');
+
+        $propMakeOrder = CUtilsPeshkariki::getConfig('PROPERTY_MAKE_ORDER', 'N');
+        $propOrderStatus = CUtilsPeshkariki::getConfig('PROPERTY_ORDER_STATUS', 'F');
 
         if ($propMakeOrder == 'N' || $propOrderStatus != $arFields)
             return;
@@ -34,8 +35,9 @@ class COrderAnmaslovPeshkariki{
             return;
 
         $pa = new PeshkarikiApi(
-            COption::GetOptionString(self::MODULE_ID, "PROPERTY_LOGIN", ''),
-            COption::GetOptionString(self::MODULE_ID, "PROPERTY_PASSWORD", '') );
+            CUtilsPeshkariki::getConfig('PROPERTY_LOGIN'),
+            CUtilsPeshkariki::getConfig('PROPERTY_PASSWORD')
+        );
 
         $token = $pa->login();
         if ($token['SUCCESS'] == false)
@@ -59,11 +61,11 @@ class COrderAnmaslovPeshkariki{
         $arrTo['items'] = $arData["ITEMS"];
 
         $arrFrom = array(
-            'name' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_NAME$cityKey", ''),
-            'phone' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_PHONE$cityKey", ''),
-            'street' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_STREET$cityKey", ''),
-            'building' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_BUILDING$cityKey", ''),
-            'apartments' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_APARTMENTS$cityKey", ''),
+            'name' => CUtilsPeshkariki::getConfig("PROPERTY_NAME$cityKey"),
+            'phone' => CUtilsPeshkariki::getConfig("PROPERTY_PHONE$cityKey"),
+            'street' => CUtilsPeshkariki::getConfig("PROPERTY_STREET$cityKey"),
+            'building' => CUtilsPeshkariki::getConfig("PROPERTY_BUILDING$cityKey"),
+            'apartments' => CUtilsPeshkariki::getConfig("PROPERTY_APARTMENTS$cityKey"),
             'time_from' => date('Y-m-d', strtotime('+1 day')) . ' 09:00:00',
             'time_to' => date('Y-m-d', strtotime('+2 day')) . ' 18:00:00',
             'items' => array(),
@@ -74,7 +76,7 @@ class COrderAnmaslovPeshkariki{
 
         $arOrder = array(
             'inner_id' => $arData['ORDER_ID'],
-            'comment' => COption::GetOptionString(self::MODULE_ID, "PROPERTY_ORDER_COMMENT", ''),
+            'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
             'cash' => 0,
             'clearing' => 0,
@@ -95,10 +97,10 @@ class COrderAnmaslovPeshkariki{
         while ($arVals = $dbProp->GetNext()) {
             switch ($arVals['CODE']) {
                 case 'FIO':
-                    $arProp['name'] = $arVals['VALUE'];
+                    $arProp['name'] = CUtilsPeshkariki::toUtf($arVals['VALUE']);
                     break;
                 case 'PHONE':
-                    $arProp['phone'] = $arVals['VALUE'];
+                    $arProp['phone'] = CUtilsPeshkariki::toUtf($arVals['VALUE']);
                     break;
                 case 'LOCATION':
                     $location = CSaleLocation::GetByID($arVals['VALUE'], LANGUAGE_ID);
@@ -107,7 +109,7 @@ class COrderAnmaslovPeshkariki{
                     $arProp['city'] = $cityKey;
                     break;
                 case 'ADDRESS':
-                    $arProp['street'] = $arVals['VALUE'];
+                    $arProp['street'] = CUtilsPeshkariki::toUtf($arVals['VALUE']);
                     break;
             }
         }
@@ -125,7 +127,7 @@ class COrderAnmaslovPeshkariki{
         $arRouteItems = array();
         while ($arItems = $dbItems->Fetch()) {
             $arRouteItems[] = array(
-                'name' => $arItems['NAME'],
+                'name' => CUtilsPeshkariki::toUtf($arItems['NAME']),
                 'price' => round($arItems['PRICE']),
                 'weight' => (intval($arItems['WEIGHT']) > 0 ? round($arItems['WEIGHT']) : '1'),
                 'quant' => $arItems['QUANTITY'],
