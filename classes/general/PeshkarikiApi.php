@@ -124,12 +124,10 @@ class PeshkarikiHttpClient
         try{
             $res = $httpClient->post(PeshkarikiApi::URL . $uri, $data);
 
-            AddMessage2Log($data, 'module_id');
-
-            if ($res == false)
+            if ($res->getError){
+                $result['DATA'] = GetMessage('ANMASLOV_PESHKARIKI_CONNECTION_ERROR');
                 return $result;
-
-            AddMessage2Log($res, 'module_id');
+            }
 
             $result['DATA'] = json_decode($res, TRUE);
 
