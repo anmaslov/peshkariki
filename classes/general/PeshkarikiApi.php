@@ -1,5 +1,7 @@
 <?php
 
+use \Bitrix\Main\Web\HttpClient;
+
 IncludeModuleLangFile(__FILE__);
 
 class PeshkarikiApi
@@ -87,9 +89,9 @@ class PeshkarikiApi
     private function query($uri, $req = array())
     {
         if (!empty($req))
-            $request = 'request=' . json_encode($req);
+            $request = /*'request=' .*/ json_encode($req);
 
-        $response = PeshkarikiCurl::request($uri, $request);
+        $response = PeshkarikiHttpClient::request($uri, $request);
         return $response;
     }
 
@@ -108,6 +110,40 @@ class PeshkarikiApi
             $res[$city] = GetMessage("ANMASLOV_PESHKARIKI_CITY_$city");
         }
         return $res;
+    }
+}
+
+class PeshkarikiHttpClient
+{
+    public static function request($uri, $data)
+    {
+        $result = array('SUCCESS' => false, 'DATA' => GetMessage('ANMASLOV_PESHKARIKI_SOME_ERROR'));
+        $httpClient = new HttpClient();
+        $httpClient->setHeader('Content-Type', 'application/json', true);
+
+        try{
+            $res = $httpClient->post(PeshkarikiApi::URL . $uri, $data);
+
+            AddMessage2Log($data, 'module_id');
+
+            if ($res == false)
+                return $result;
+
+            AddMessage2Log($res, 'module_id');
+
+            $result['DATA'] = json_decode($res, TRUE);
+
+            if($result['DATA']['success'] == false){
+                $result['DATA'] = PeshkarikiApi::getErrorMsg($result['DATA']['code']);
+            }else{
+                $result['SUCCESS'] = true;
+            }
+
+        }catch (Exception $e){
+            $result['DATA'] = GetMessage('ANMASLOV_PESHKARIKI_CONNECTION_ERROR');
+        }
+
+        return $result;
     }
 }
 
