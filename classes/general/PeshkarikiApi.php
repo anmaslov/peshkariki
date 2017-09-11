@@ -12,13 +12,14 @@ class PeshkarikiApi
     private $token = '';
     private $login;
     private $password;
-    private $error;
 
-    public function __construct($login, $password)
+    private $httpClient;
+
+    public function __construct(PeshkarikiHttpClient $httpClient, $login, $password)
     {
+        $this->httpClient = $httpClient;
         $this->login = $login;
         $this->password = $password;
-        //$this->token = $token;
     }
 
     public function login()
@@ -91,7 +92,8 @@ class PeshkarikiApi
         if (!empty($req))
             $request = /*'request=' .*/ json_encode($req);
 
-        $response = PeshkarikiHttpClient::request($uri, $request);
+        //$response = PeshkarikiHttpClient::request($uri, $request);
+        $response = $this->httpClient->request($uri, $request);
         return $response;
     }
 
@@ -113,9 +115,15 @@ class PeshkarikiApi
     }
 }
 
-class PeshkarikiHttpClient
+abstract class PeshkarikiHttpClient{
+
+    abstract public function request($uri, $data);
+
+}
+
+class BitrixHttpClient extends PeshkarikiHttpClient
 {
-    public static function request($uri, $data)
+    public function request($uri, $data)
     {
         $result = array('SUCCESS' => false, 'DATA' => GetMessage('ANMASLOV_PESHKARIKI_SOME_ERROR'));
         $httpClient = new HttpClient();
@@ -145,9 +153,9 @@ class PeshkarikiHttpClient
     }
 }
 
-class PeshkarikiCurl
+class CurlHttpClient extends PeshkarikiHttpClient
 {
-    public static function request($uri, $data)
+    public function request($uri, $data)
     {
         $result = array('SUCCESS' => false, 'DATA' => GetMessage('ANMASLOV_PESHKARIKI_SOME_ERROR'));
 

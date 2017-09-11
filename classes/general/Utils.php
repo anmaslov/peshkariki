@@ -39,6 +39,15 @@ class CUtilsPeshkariki
         return self::toUtf(COption::GetOptionString(self::MODULE_ID, $configStr, $default));
     }
 
+    public static function getCurrentClient()
+    {
+        $client = COption::GetOptionString(self::MODULE_ID, 'PROPERTY_CLIENT', 'BITRIX');
+        if ($client == 'CURL')
+            return new CurlHttpClient();
+        else
+            return new BitrixHttpClient();
+    }
+
     public function ASD_OnEventLogGetAuditTypes()
     {
         return array('PESHKARIKI_TYPE' => GetMessage('ANMASLOV_PESHKARIKI_OWN_TYPE'));

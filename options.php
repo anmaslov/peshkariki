@@ -67,6 +67,8 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
         $weight = (intval($_POST['PROPERTY_WEIGHT']) < 10 ? 10 : intval($_POST['PROPERTY_WEIGHT']));
         COption::SetOptionInt($module_id, 'PROPERTY_WEIGHT', $weight, GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT'));
 
+        COption::SetOptionString($module_id, 'PROPERTY_CLIENT', $_POST['PROPERTY_CLIENT'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT'));
+
         $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_STATUS', $_POST['PROPERTY_ORDER_STATUS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'));
@@ -118,19 +120,35 @@ $tabControl->Begin();
         </td>
         <td width="70%">
             <? $val = COption::GetOptionString($module_id,'PROPERTY_MAKE_LOG', 'N');?>
-            <input type="checkbox" name="PROPERTY_MAKE_LOG" id="make_log" value="Y" <?=($val == 'Y' ?' checked':'')?>>
+            <input type="checkbox" name="PROPERTY_MAKE_LOG" id="make_log" value="Y" <?=($val == 'Y' ?' checked':'')?>> -
+            <a href="/bitrix/admin/event_log.php?set_filter=Y&find_type=audit_type_id&find_audit_type%5B0%5D=PESHKARIKI_TYPE" target="_blank"><?=GetMessage('ANMASLOV_PESHKARIKI_OPT_LOG_HREF')?></a>
         </td>
     </tr>
 
     <tr>
         <td width="30%" valign="top">
-            <label for="PROPERTY_LOGIN"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT")?>:</label>
+            <label for="PROPERTY_WEIGH"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT")?>:</label>
         </td>
         <td width="70%">
             <? $val = COption::GetOptionInt($module_id,'PROPERTY_WEIGHT', 10);?>
             <input type="text" size="30" maxlength="255" id="PROPERTY_WEIGH"
                    value="<?=htmlspecialcharsbx($val)?>"
                    name="PROPERTY_WEIGHT" />
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_CLIENT"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLIENT")?>:</label>
+        </td>
+        <td width="70%">
+
+            <? $val = COption::GetOptionString($module_id, 'PROPERTY_CLIENT', 'BITRIX');?>
+            <select name="PROPERTY_CLIENT" id="PROPERTY_CLIENT">
+                <option value="BITRIX" <?=((htmlspecialcharsbx($val) == 'BITRIX') ? 'selected="selected"' : '')?>>Bitrix API client</option>
+                <option value="CURL"  <?=((htmlspecialcharsbx($val) == 'CURL') ? 'selected="selected"' : '')?>>Curl</option>
+            </select>
+
         </td>
     </tr>
 

@@ -117,6 +117,7 @@ Class CDeliveryAnmaslovPeshkariki
         }
 
         $pa = new PeshkarikiApi(
+            CUtilsPeshkariki::getCurrentClient(),
             CUtilsPeshkariki::getConfig("PROPERTY_LOGIN"),
             CUtilsPeshkariki::getConfig("PROPERTY_PASSWORD")
         );
@@ -150,13 +151,15 @@ Class CDeliveryAnmaslovPeshkariki
     function prepare($arOrder)
     {
         $location = CSaleLocation::GetByID($arOrder['LOCATION_TO'], LANGUAGE_ID);
-        //$location['CITY_NAME']
 
         $arrCity = PeshkarikiApi::getCityList();
         $cityKey = array_search($location['CITY_NAME'], $arrCity);
 
-        if ($cityKey == false)
+        if ($cityKey == false){
             return false;
+            CUtilsPeshkariki::addLog('City key not found', 'get_cityKey', 'ERROR');
+        }
+
 
         $arrFrom = array(
             'name' => CUtilsPeshkariki::getConfig("PROPERTY_NAME$cityKey"),

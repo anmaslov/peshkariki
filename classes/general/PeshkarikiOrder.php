@@ -37,6 +37,7 @@ class COrderAnmaslovPeshkariki{
             return;
 
         $pa = new PeshkarikiApi(
+            CUtilsPeshkariki::getCurrentClient(),
             CUtilsPeshkariki::getConfig('PROPERTY_LOGIN'),
             CUtilsPeshkariki::getConfig('PROPERTY_PASSWORD')
         );
