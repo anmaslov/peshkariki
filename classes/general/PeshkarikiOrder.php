@@ -114,6 +114,12 @@ class COrderAnmaslovPeshkariki{
                     $cityKey = array_search($location['CITY_NAME'], $arrCity);
                     $arProp['city'] = $cityKey;
                     break;
+                case 'CITY':
+		    $location = CSaleLocation::GetByID($arVals['VALUE'], LANGUAGE_ID);
+                    $arrCity = PeshkarikiApi::getCityList();
+                    $cityKey = array_search($location['CITY_NAME'], $arrCity);
+                    $arProp['city'] = $cityKey;
+                    break;
                 case 'ADDRESS':
                     $arProp['street'] = CUtilsPeshkariki::toUtf($arVals['VALUE']);
                     break;
