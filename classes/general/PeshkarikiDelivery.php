@@ -192,7 +192,7 @@ Class CDeliveryAnmaslovPeshkariki
             'comment' => 'check price',
             "calculate" => 1,
             'cash' => 0,
-            'clearing' => 0,
+            'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
             'order_type_id' => 1,

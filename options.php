@@ -67,7 +67,9 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
         $weight = (intval($_POST['PROPERTY_WEIGHT']) < 10 ? 10 : intval($_POST['PROPERTY_WEIGHT']));
         COption::SetOptionInt($module_id, 'PROPERTY_WEIGHT', $weight, GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT'));
 
-        COption::SetOptionString($module_id, 'PROPERTY_CLIENT', $_POST['PROPERTY_CLIENT'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT'));
+        COption::SetOptionString($module_id, 'PROPERTY_CLIENT', $_POST['PROPERTY_CLIENT'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_CLIENT'));
+
+        COption::SetOptionString($module_id, 'PROPERTY_CLEARING', $_POST['PROPERTY_CLEARING'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING'));
 
         $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
@@ -149,6 +151,20 @@ $tabControl->Begin();
                 <option value="CURL"  <?=((htmlspecialcharsbx($val) == 'CURL') ? 'selected="selected"' : '')?>>Curl</option>
             </select>
 
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_CLEARING"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING")?>:</label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionString($module_id, 'PROPERTY_CLEARING', 0);?>
+            <select name="PROPERTY_CLEARING" id="PROPERTY_CLEARING">
+                <option value="0" <?=((htmlspecialcharsbx($val) == 0) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_0")?></option>
+                <option value="1"  <?=((htmlspecialcharsbx($val) == 1) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_1")?></option>
+            </select>
+            <br /><strong><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_DESC")?>.</strong>
         </td>
     </tr>
 

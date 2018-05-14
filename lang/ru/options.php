@@ -13,6 +13,10 @@ $MESS ['ANMASLOV_PESHKARIKI_OPT_MAKE_LOG'] = "Вести логирование"
 $MESS ['ANMASLOV_PESHKARIKI_OPT_LOG_HREF'] = "Открыть журнал";
 $MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_WEIGHT'] = "Вес товара в граммах (если не указан у товара)";
 $MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_CLIENT'] = "Соединение с сайтом пешкарики через";
+$MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING'] = "Оплата заказа";
+$MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_0'] = "Наличные с получателя/отправителя";
+$MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_1'] = "Со счета в пешкариках";
+$MESS ['ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_DESC'] = "Для Юр.лиц недоступно создание заказов с оплатой наличными, только с баланса (счета) пешкариков";
 
 $MESS ['ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'] = "Автоматически формировать заказ в системе Пешкарики";
 $MESS ['ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'] = "Статус заказа, при кототором формировать запрос";
