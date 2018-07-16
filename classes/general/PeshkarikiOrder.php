@@ -59,6 +59,7 @@ class COrderAnmaslovPeshkariki{
         unset($arData['ORDER']['city']);
 
         $arrTo = $arData['ORDER'];
+        $arrTo['name'] = (strlen($arrTo['name'])>0) ? $arrTo['name'] : GetMessage('ANMASLOV_PESHKARIKI_NOT_NAME');
         $arrTo['time_from'] = date('Y-m-d', strtotime('+1 day')) . ' 09:00:00';
         $arrTo['time_to'] = date('Y-m-d', strtotime('+2 day')) . ' 18:00:00';
         $arrTo['items'] = $arData["ITEMS"];
@@ -82,7 +83,7 @@ class COrderAnmaslovPeshkariki{
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
             'cash' => 0,
-            'clearing' => 0,
+            'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
             'order_type_id' => 1,
