@@ -82,7 +82,7 @@ class COrderAnmaslovPeshkariki{
             'inner_id' => $arData['ORDER_ID'],
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
-            'cash' => 0,
+            'cash' => 0, //todo Оплата наличными курьеру, либо предоплачен товар уже
             'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
