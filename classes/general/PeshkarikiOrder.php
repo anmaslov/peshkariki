@@ -46,8 +46,16 @@ class COrderAnmaslovPeshkariki{
         if ($token['SUCCESS'] == false)
             return;
 
-        $price = $pa->addOrder($arData);
-        CUtilsPeshkariki::addLog($price, 'add_new_order', 'INFO');
+        $order = $pa->addOrder($arData);
+        CUtilsPeshkariki::addLog($order, 'add_new_order', 'INFO');
+
+        if ($order['SUCCESS'] == true) {
+            $pId = $order['DATA']['response'][$id]['id'];
+            CSaleOrder::Update($id, 
+                array("TRACKING_NUMBER" => $pId)
+            );
+        }
+
         return $price;
     }
 
