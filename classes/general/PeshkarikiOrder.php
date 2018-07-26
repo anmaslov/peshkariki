@@ -90,13 +90,19 @@ class COrderAnmaslovPeshkariki{
             'inner_id' => $arData['ORDER_ID'],
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
-            'cash' => 0, //todo Оплата наличными курьеру, либо предоплачен товар уже
+            'cash' => CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD'), //0-товар предоплачен
             'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
             'order_type_id' => 1,
             'route' => array($arrFrom, $arrTo)
         );
+        
+        //если 1 - необходимо забрать оплату наличными
+        if (CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD') == 1) {
+            $arOrder['ewalletType'] = CUtilsPeshkariki::getConfig('PROPERTY_CACH_RETURN_METHOD');
+            $arOrder['ewallet'] = CUtilsPeshkariki::getConfig('PROPERTY_RETURN_CONTACTS');
+        }
 
         return $arOrder;
     }
