@@ -73,7 +73,14 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
 
         $chBx = ($_POST['PROPERTY_MAKE_ORDER'] == 'Y' ? 'Y' : 'N');
         COption::SetOptionString($module_id, 'PROPERTY_MAKE_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_MAKE_ORDER'));
+        $chBx = ($_POST['PROPERTY_CANCEL_ORDER'] == 'Y' ? 'Y' : 'N');
+        COption::SetOptionString($module_id, 'PROPERTY_CANCEL_ORDER', $chBx, GetMessage('ANMASLOV_PESHKARIKI_OPT_CANCEL_ORDER'));
+
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_STATUS', $_POST['PROPERTY_ORDER_STATUS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS'));
+
+        COption::SetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD', $_POST['PROPERTY_PAYMENT_METHOD'], GetMessage('ANMASLOV_PESHKARIKI_OPT_PAYMENT_METHOD'));
+        COption::SetOptionString($module_id, 'PROPERTY_CACH_RETURN_METHOD', $_POST['PROPERTY_CACH_RETURN_METHOD'], GetMessage('ANMASLOV_PESHKARIKI_OPT_CACH_RETURN_METHOD'));
+        COption::SetOptionString($module_id, 'PROPERTY_RETURN_CONTACTS', $_POST['PROPERTY_RETURN_CONTACTS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_RETURN_CONTACTS'));   
 
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_COMMENT', $_POST['PROPERTY_ORDER_COMMENT'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT'));
 
@@ -154,20 +161,6 @@ $tabControl->Begin();
         </td>
     </tr>
 
-    <tr>
-        <td width="30%" valign="top">
-            <label for="PROPERTY_CLEARING"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING")?>:</label>
-        </td>
-        <td width="70%">
-            <? $val = COption::GetOptionString($module_id, 'PROPERTY_CLEARING', 0);?>
-            <select name="PROPERTY_CLEARING" id="PROPERTY_CLEARING">
-                <option value="0" <?=((htmlspecialcharsbx($val) == 0) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_0")?></option>
-                <option value="1"  <?=((htmlspecialcharsbx($val) == 1) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_1")?></option>
-            </select>
-            <br /><strong><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_DESC")?>.</strong>
-        </td>
-    </tr>
-
     <?
     $tabControl->BeginNextTab();
     ?>
@@ -216,6 +209,16 @@ $tabControl->Begin();
 
     <tr>
         <td width="30%">
+            <label for="cancel_order"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_CANCEL_ORDER") ?></label>
+        </td>
+        <td>
+            <? $val = COption::GetOptionString($module_id,'PROPERTY_CANCEL_ORDER', '');?>
+            <input type="checkbox" name="PROPERTY_CANCEL_ORDER" id="cancel_order" value="Y" <?=($val == 'Y' ?' checked':'')?>>
+        </td>
+    </tr>
+
+    <tr>
+        <td width="30%">
             <label for="ORDER_STATUS">
                 <?=GetMessage("ANMASLOV_PESHKARIKI_OPT_ORDER_STATUS") ?>
             </label>
@@ -230,6 +233,54 @@ $tabControl->Begin();
         </td>
     </tr>
 
+    <tr>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_CLEARING"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING")?>:</label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionString($module_id, 'PROPERTY_CLEARING', 0);?>
+            <select name="PROPERTY_CLEARING" id="PROPERTY_CLEARING">
+                <option value="0" <?=((htmlspecialcharsbx($val) == 0) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_0")?></option>
+                <option value="1"  <?=((htmlspecialcharsbx($val) == 1) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_1")?></option>
+            </select>
+            <br /><strong><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CLEARING_DESC")?>.</strong>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td width="30%" valign="top">
+            <label for="PROPERTY_PAYMENT_METHOD"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PAYMENT_METHOD")?>:</label>
+        </td>
+        <td width="70%">
+            <? $payMethod = COption::GetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD', 0);?>
+            <select name="PROPERTY_PAYMENT_METHOD" id="PROPERTY_PAYMENT_METHOD" onchange='disableCashMethod(this.value);'>
+                <option value="0" <?=((htmlspecialcharsbx($payMethod) == 0) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_PM_0")?></option>
+                <option value="1"  <?=((htmlspecialcharsbx($payMethod) == 1) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_PM_1")?></option>
+            </select>  
+        </td>
+    </tr>
+
+    <tr id="cach_method">
+        <td width="30%" valign="top">
+            <label for="PROPERTY_CACH_RETURN_METHOD"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_CACH_RETURN_METHOD")?>:</label>
+        </td>
+        <td width="70%">
+            <? $val = COption::GetOptionString($module_id, 'PROPERTY_CACH_RETURN_METHOD', 0);?>
+            <select name="PROPERTY_CACH_RETURN_METHOD" id="PROPERTY_CACH_RETURN_METHOD">
+                <option value="0" <?=((htmlspecialcharsbx($val) == 0) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CRM_0")?></option>
+                <option value="1"  <?=((htmlspecialcharsbx($val) == 1) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CRM_1")?></option>
+                <option value="2"  <?=((htmlspecialcharsbx($val) == 2) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_CRM_2")?></option>
+            </select>  
+            <? $val = COption::GetOptionString($module_id, 'PROPERTY_RETURN_CONTACTS', '');?>
+            <input id="PROPERTY_RETURN_CONTACTS" 
+                name="PROPERTY_RETURN_CONTACTS" 
+                placeholder="<?=GetMessage("ANMASLOV_PESHKARIKI_OPT_RETURN_CONTACTS")?>" 
+                value="<?=htmlspecialcharsbx($val)?>"
+                type="text" autocomplete="off">
+        </td>
+    </tr>
+        
     <tr>
         <td width="30%">
             <label for="order_comment"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT") ?></label>
@@ -248,6 +299,18 @@ $tabControl->Begin();
         function confirmRestoreDefaults()
         {
             return confirm('<?echo AddSlashes(GetMessage("MAIN_HINT_RESTORE_DEFAULTS_WARNING"))?>');
+        }
+
+        disableCashMethod(<?=$payMethod?>);
+
+        function disableCashMethod(sel)
+        {
+            var area = document.getElementById("cach_method").style;
+            
+            if (sel == 1) 
+                area.display = '';
+            else
+                area.display = 'none';
         }
     </script>
     <input type="submit" name="Update" value="<?echo GetMessage("MAIN_SAVE")?>">

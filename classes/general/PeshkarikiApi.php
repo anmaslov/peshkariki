@@ -73,7 +73,8 @@ class PeshkarikiApi
     public function cancelOrder($orderId)
     {
         $req['order_id'] = $orderId;
-        $this->query('cancelOrder', $req);
+        $req['token'] = $this->token;
+        return $this->query('cancelOrder', $req);
     }
 
     public function orderDetails($orderId)

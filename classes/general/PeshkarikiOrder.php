@@ -21,11 +21,13 @@ class COrderAnmaslovPeshkariki{
             return;
 
         $arProp = self::getOrderProps($id);
-        if ($arProp['city'] == false)
+        if ($arProp['city'] == false) {
+            CUtilsPeshkariki::addLog(GetMessage('ANMASLOV_PESHKARIKI_NOT_CITY'), 'add_order', 'ERROR');
             return;
+        }            
 
         $arRouteItems = self::getItems($id);
-
+        
         $arPrepare = array(
             'ORDER_ID' => $id,
             'ORDER' => $arProp,
@@ -35,6 +37,8 @@ class COrderAnmaslovPeshkariki{
         $arData = self::prepareData($arPrepare);
         if (!$arData)
             return;
+
+        CUtilsPeshkariki::addLog($arData, 'add_order', 'INFO');
 
         $pa = new PeshkarikiApi(
             CUtilsPeshkariki::getCurrentClient(),
@@ -46,15 +50,54 @@ class COrderAnmaslovPeshkariki{
         if ($token['SUCCESS'] == false)
             return;
 
-        $price = $pa->addOrder($arData);
-        CUtilsPeshkariki::addLog($price, 'add_new_order', 'INFO');
+        $order = $pa->addOrder($arData);
+        CUtilsPeshkariki::addLog($order, 'add_new_order', 'INFO');
+
+        if ($order['SUCCESS'] == true) {
+            $pId = $order['DATA']['response'][$id]['id'];
+            CSaleOrder::Update($id, 
+                array("TRACKING_NUMBER" => $pId)
+            );
+        }
+
         return $price;
+    }
+
+    public static function cancelOrder($id, $cancel)
+    {
+        $propCancelOrder = CUtilsPeshkariki::getConfig('PROPERTY_CANCEL_ORDER', 'N');
+
+        if ($propCancelOrder == 'N' || $cancel != 'Y')
+            return;
+        
+        $arOrder = CSaleOrder::GetById($id);
+        
+        //Если пустой номер трека
+        if ($arOrder['DELIVERY_ID'] != 'anmaslov_peshkariki:courier' || strlen($arOrder['TRACKING_NUMBER']) == 0) {
+            CUtilsPeshkariki::addLog(GetMessage('ANMASLOV_PESHKARIKI_NOT_TRACK_NUMBER'), 'cancel_order', 'ERROR');
+            return;
+        }
+        
+        $pa = new PeshkarikiApi(
+            CUtilsPeshkariki::getCurrentClient(),
+            CUtilsPeshkariki::getConfig('PROPERTY_LOGIN'),
+            CUtilsPeshkariki::getConfig('PROPERTY_PASSWORD')
+        );
+    
+        $token = $pa->login();
+        if ($token['SUCCESS'] == false)
+            return;
+
+        $order = $pa->cancelOrder($arOrder['TRACKING_NUMBER']);
+        CUtilsPeshkariki::addLog($order, 'cancel_order', 'INFO');
     }
 
     public static function prepareData($arData)
     {
-        if (!$cityKey = $arData['ORDER']['city'])
+        if (!$cityKey = $arData['ORDER']['city']){
+            CUtilsPeshkariki::addLog(GetMessage('ANMASLOV_PESHKARIKI_NOT_CITY'), 'prepareData', 'ERROR');
             return false;
+        }
 
         unset($arData['ORDER']['city']);
 
@@ -75,20 +118,28 @@ class COrderAnmaslovPeshkariki{
             'items' => array(),
         );
 
-        if (strlen($arrFrom['name'].$arrFrom['phone'].$arrFrom['street'].$arrFrom['building']) == 0)
+        if (strlen($arrFrom['name'].$arrFrom['phone'].$arrFrom['street'].$arrFrom['building']) == 0) {
+            CUtilsPeshkariki::addLog(GetMessage('ANMASLOV_PESHKARIKI_BLANK_STRING'), 'prepareData', 'ERROR');
             return false;
+        }
 
         $arOrder = array(
             'inner_id' => $arData['ORDER_ID'],
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
-            'cash' => 0,
+            'cash' => CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD'), //0-товар предоплачен
             'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
             'order_type_id' => 1,
             'route' => array($arrFrom, $arrTo)
         );
+
+        //если 1 - необходимо забрать оплату наличными
+        if (CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD') == 1) {
+            $arOrder['ewalletType'] = CUtilsPeshkariki::getConfig('PROPERTY_CACH_RETURN_METHOD');
+            $arOrder['ewallet'] = CUtilsPeshkariki::getConfig('PROPERTY_RETURN_CONTACTS');
+        }
 
         return $arOrder;
     }

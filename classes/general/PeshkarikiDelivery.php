@@ -56,6 +56,7 @@ Class CDeliveryAnmaslovPeshkariki
         $arConfig = array(
             'CONFIG_GROUPS' => array(
                 'delivery' => GetMessage('ANMASLOV_PESHKARIKI_CONFIG_DELIVERY_TITLE'),
+                'price' => GetMessage('ANMASLOV_PESHKARIKI_CONFIG_DELIVERY_PRICE_TITLE'),
             ),
 
             'CONFIG' => array(
@@ -63,7 +64,13 @@ Class CDeliveryAnmaslovPeshkariki
                     'TYPE' => 'SECTION',
                     'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_TITLE_API_SECTION_HEADER'),
                     'GROUP' => 'delivery'
-                )
+                ),
+                'DELIVERY_MIN_PRICE' => array(
+                    'TYPE' => 'STRING',
+                    'DEFAULT' => 0,
+                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_TITLE_DELIVERY_MIN_PRICE'),
+                    'GROUP' => 'price'
+                ),
             ),
         );
         return $arConfig;
@@ -133,11 +140,15 @@ Class CDeliveryAnmaslovPeshkariki
 
         //get price
         $price = $pa->addOrder($arData, $pa::CALCULATE);
-        if($price['SUCCESS'] == false){
+        if ($price['SUCCESS'] == false){
             CUtilsPeshkariki::addLog($price, 'get_price', 'ERROR');
             $result['TEXT'] = $price['DATA'];
             return $result;
         }
+
+        if (($arConfig['DELIVERY_MIN_PRICE']['VALUE'] > 0) 
+            && ($arConfig['DELIVERY_MIN_PRICE']['VALUE'] > $price['DATA']))
+            $price['DATA'] = $arConfig['DELIVERY_MIN_PRICE']['VALUE'];
 
         $result['RESULT'] = 'OK';
         $result['TEXT'] = $price['DATA'];
