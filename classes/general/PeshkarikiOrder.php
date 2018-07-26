@@ -59,6 +59,33 @@ class COrderAnmaslovPeshkariki{
         return $price;
     }
 
+    public static function cancelOrder($id, $cancel)
+    {
+        $propCancelOrder = CUtilsPeshkariki::getConfig('PROPERTY_CANCEL_ORDER', 'N');
+
+        if ($propCancelOrder == 'N' || $cancel != 'Y')
+            return;
+        
+        $arOrder = CSaleOrder::GetById($id);
+        
+        //Если пустой номер трека
+        if ($arOrder['DELIVERY_ID'] != 'anmaslov_peshkariki:courier' || strlen($arOrder['TRACKING_NUMBER']) == 0)
+            return;
+        
+        $pa = new PeshkarikiApi(
+            CUtilsPeshkariki::getCurrentClient(),
+            CUtilsPeshkariki::getConfig('PROPERTY_LOGIN'),
+            CUtilsPeshkariki::getConfig('PROPERTY_PASSWORD')
+        );
+    
+        $token = $pa->login();
+        if ($token['SUCCESS'] == false)
+            return;
+
+        $order = $pa->cancelOrder($arOrder['TRACKING_NUMBER']);
+        CUtilsPeshkariki::addLog($order, 'cancel_order', 'INFO');    
+    }
+
     public static function prepareData($arData)
     {
         if (!$cityKey = $arData['ORDER']['city'])
@@ -97,7 +124,7 @@ class COrderAnmaslovPeshkariki{
             'order_type_id' => 1,
             'route' => array($arrFrom, $arrTo)
         );
-        
+
         //если 1 - необходимо забрать оплату наличными
         if (CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD') == 1) {
             $arOrder['ewalletType'] = CUtilsPeshkariki::getConfig('PROPERTY_CACH_RETURN_METHOD');
