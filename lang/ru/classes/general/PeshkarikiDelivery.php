@@ -11,5 +11,6 @@ $MESS['ANMASLOV_PESHKARIKI_TITLE_API_SECTION_HEADER'] = '<a href="/bitrix/admin/
 
 $MESS['ANMASLOV_PESHKARIKI_CONFIG_DELIVERY_PRICE_TITLE'] = 'Настройка стоимости';
 $MESS['ANMASLOV_PESHKARIKI_TITLE_DELIVERY_MIN_PRICE'] = 'Минимальная стоимость доставки';
+$MESS['ANMASLOV_PESHKARIKI_TITLE_DELIVERY_FIX_PRICE'] = 'Фиксированная стоимость доставки';
 
 $MESS['ANMASLOV_PESHKARIKI_TEXT_ERROR'] = 'Не удалось рассчитать срок и стоимость доставки';
