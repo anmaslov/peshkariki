@@ -71,6 +71,12 @@ Class CDeliveryAnmaslovPeshkariki
                     'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_TITLE_DELIVERY_MIN_PRICE'),
                     'GROUP' => 'price'
                 ),
+                'DELIVERY_FIX_PRICE' => array(
+                    'TYPE' => 'STRING',
+                    'DEFAULT' => 0,
+                    'TITLE' => GetMessage('ANMASLOV_PESHKARIKI_TITLE_DELIVERY_FIX_PRICE'),
+                    'GROUP' => 'price'
+                ),
             ),
         );
         return $arConfig;
@@ -149,6 +155,9 @@ Class CDeliveryAnmaslovPeshkariki
         if (($arConfig['DELIVERY_MIN_PRICE']['VALUE'] > 0) 
             && ($arConfig['DELIVERY_MIN_PRICE']['VALUE'] > $price['DATA']))
             $price['DATA'] = $arConfig['DELIVERY_MIN_PRICE']['VALUE'];
+
+        if ($arConfig['DELIVERY_FIX_PRICE']['VALUE'] > 0)
+            $price['DATA'] = $arConfig['DELIVERY_FIX_PRICE']['VALUE'];
 
         $result['RESULT'] = 'OK';
         $result['TEXT'] = $price['DATA'];
