@@ -28,6 +28,16 @@ while ($arStatus = $rsStatus->Fetch())
     );
 }
 
+//get pay systems
+$rsPaySystems = CSalePaySystemAction::GetList(array(), array("PS_ACTIVE" => "Y"));
+while ($arPaySystem = $rsPaySystems->Fetch())
+{
+    $arPaySystems[] = array(
+        'ID' => $arPaySystem['ID'],
+        'NAME' => '[' . $arPaySystem['ID'] .'] '. $arPaySystem['NAME'],
+    );
+}
+
 $arAllOptions = Array(
     array("PROPERTY_NAME", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_NAME")),
     array("PROPERTY_PHONE", GetMessage("ANMASLOV_PESHKARIKI_SETTINGS_PHONE")),
@@ -84,9 +94,26 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
         COption::SetOptionString($module_id, 'PROPERTY_RETURN_CONTACTS', $_POST['PROPERTY_RETURN_CONTACTS'], GetMessage('ANMASLOV_PESHKARIKI_OPT_RETURN_CONTACTS'));   
 
         COption::SetOptionString($module_id, 'PROPERTY_ORDER_COMMENT', $_POST['PROPERTY_ORDER_COMMENT'], GetMessage('ANMASLOV_PESHKARIKI_OPT_ORDER_COMMENT'));
+        
+        $pay_method_sel = $_POST['PROPERTY_PAYMENT_METHOD_SEL'];
+        $errPaysIntersect = array_intersect($pay_method_sel['PAYED'], $pay_method_sel['CURIER']);
+        
+        if (count($errPaysIntersect)) {
+            CAdminMessage::ShowMessage(GetMessage('ANMASLOV_PESHKARIKI_PAYMENT_INTERSECT_ERR'));
+        } else {
+            COption::SetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD_PAYED', 
+                                    implode($pay_method_sel['PAYED'], ','), 
+                                    GetMessage('ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_PAYED'));
+
+            COption::SetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD_CURIER', 
+                                    implode($pay_method_sel['CURIER'], ','), 
+                                    GetMessage('ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_CURIER'));
+        }
 
     }
 }
+
+//CAdminMessage::ShowNote('Show simple notification');
 
 $tabControl->Begin();
 ?>
@@ -248,17 +275,53 @@ $tabControl->Begin();
         </td>
     </tr>
 
-
     <tr>
         <td width="30%" valign="top">
             <label for="PROPERTY_PAYMENT_METHOD"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PAYMENT_METHOD")?>:</label>
         </td>
         <td width="70%">
             <? $payMethod = COption::GetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD', 0);?>
-            <select name="PROPERTY_PAYMENT_METHOD" id="PROPERTY_PAYMENT_METHOD" onchange='disableCashMethod(this.value);'>
+            <select name="PROPERTY_PAYMENT_METHOD" id="PROPERTY_PAYMENT_METHOD">
                 <option value="0" <?=((htmlspecialcharsbx($payMethod) == 0) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_PM_0")?></option>
                 <option value="1"  <?=((htmlspecialcharsbx($payMethod) == 1) ? 'selected="selected"' : '')?>><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PROP_PM_1")?></option>
             </select>  
+        </td>
+    </tr>
+
+    <tr id="payment_more">
+        <td width="30%" valign="top">
+            <label for="PROPERTY_PAYMENT_METHOD_SEL"><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_PAYMENT_FOR")?>:</label>
+        </td>
+        <td width="70%">
+            <table>
+                <tr>
+                    <td width="50%">
+                        <?=GetMessage("ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_PAYED")?>:<br>
+                        <?$payVal = explode(',', COption::GetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD_PAYED', ''));?>
+                        <select name="PROPERTY_PAYMENT_METHOD_SEL[PAYED][]" multiple="">
+                            <?foreach($arPaySystems as $paySystem):?>
+                                <option value="<?=$paySystem['ID']?>" <?=(in_array($paySystem['ID'], $payVal) ? ' selected=""' :'')?>>
+                                    <?=$paySystem['NAME']?>
+                                </option>
+                            <?endforeach?>
+                        </select>        
+                    </td>
+                    <td  width="50%">
+                        <?=GetMessage("ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_CURIER")?>:<br>
+                        <?$payVal = explode(',', COption::GetOptionString($module_id, 'PROPERTY_PAYMENT_METHOD_CURIER', ''));?>
+                        <select name="PROPERTY_PAYMENT_METHOD_SEL[CURIER][]" multiple="">
+                        <?foreach($arPaySystems as $paySystem):?>
+                            <option value="<?=$paySystem['ID']?>" <?=(in_array($paySystem['ID'], $payVal) ? ' selected=""' :'')?>>
+                                <?=$paySystem['NAME']?>
+                            </option>
+                        <?endforeach?>
+                        </select>        
+                    </td>
+                </tr>
+            </table>
+
+            <i><?=GetMessage("ANMASLOV_PESHKARIKI_PAYMENT_METHOD_DESCRIPTION")?></i>
+
         </td>
     </tr>
 
@@ -279,6 +342,8 @@ $tabControl->Begin();
                 placeholder="<?=GetMessage("ANMASLOV_PESHKARIKI_OPT_RETURN_CONTACTS")?>" 
                 value="<?=htmlspecialcharsbx($val)?>"
                 type="text" autocomplete="off">
+                <br>
+                <b><?=GetMessage("ANMASLOV_PESHKARIKI_OPT_CACH_RETURN_METHOD_DESC")?></b>
         </td>
     </tr>
         
@@ -300,18 +365,6 @@ $tabControl->Begin();
         function confirmRestoreDefaults()
         {
             return confirm('<?echo AddSlashes(GetMessage("MAIN_HINT_RESTORE_DEFAULTS_WARNING"))?>');
-        }
-
-        disableCashMethod(<?=$payMethod?>);
-
-        function disableCashMethod(sel)
-        {
-            var area = document.getElementById("cach_method").style;
-            
-            if (sel == 1) 
-                area.display = '';
-            else
-                area.display = 'none';
         }
     </script>
     <input type="submit" name="Update" value="<?echo GetMessage("MAIN_SAVE")?>">
