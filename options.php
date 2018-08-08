@@ -287,7 +287,7 @@ $tabControl->Begin();
         </td>
         <td>
             <? $val = COption::GetOptionString($module_id,'PROPERTY_ORDER_COMMENT', '');?>
-            <input type="text" size="30" maxlength="255" id="order_comment"
+            <input type="text" size="40" maxlength="40" id="order_comment"
                    value="<?=htmlspecialcharsbx($val)?>"
                    name="PROPERTY_ORDER_COMMENT" />
         </td>
