@@ -8,7 +8,6 @@ class COrderAnmaslovPeshkariki{
 
     public static function addOrder($id, $arFields)
     {
-
         $propMakeOrder = CUtilsPeshkariki::getConfig('PROPERTY_MAKE_ORDER', 'N');
         $propOrderStatus = CUtilsPeshkariki::getConfig('PROPERTY_ORDER_STATUS', 'F');
 
@@ -32,6 +31,7 @@ class COrderAnmaslovPeshkariki{
             'ORDER_ID' => $id,
             'ORDER' => $arProp,
             'ITEMS' => $arRouteItems,
+            'ORDER_DETAIL' => $arOrder,
         );
 
         $arData = self::prepareData($arPrepare);
@@ -59,7 +59,7 @@ class COrderAnmaslovPeshkariki{
                 array("TRACKING_NUMBER" => $pId)
             );
         }
-
+        
         return $price;
     }
 
@@ -124,11 +124,13 @@ class COrderAnmaslovPeshkariki{
             return false;
         }
 
+        $cash = self::getCashType($arData['ORDER_DETAIL']['PAY_SYSTEM_ID']); 
+
         $arOrder = array(
             'inner_id' => $arData['ORDER_ID'],
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
-            'cash' => CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD'), //0-товар предоплачен
+            'cash' => $cash, //0-товар предоплачен
             'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
@@ -137,12 +139,32 @@ class COrderAnmaslovPeshkariki{
         );
 
         //если 1 - необходимо забрать оплату наличными
-        if (CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD') == 1) {
+        if ($cash == 1) {
             $arOrder['ewalletType'] = CUtilsPeshkariki::getConfig('PROPERTY_CACH_RETURN_METHOD');
             $arOrder['ewallet'] = CUtilsPeshkariki::getConfig('PROPERTY_RETURN_CONTACTS');
         }
 
         return $arOrder;
+    }
+
+    /**
+     * Брать деньги за товар
+     * 0 - товар оплачен, денег не брать
+     * 1 - товар не оплачен, брать деньги
+     */
+    public static function getCashType($paySystemId)
+    {
+        $cash = CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD', 0); //Значение по умолчанию
+        
+        $payVal = explode(',', CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD_PAYED', ''));
+        if (in_array($paySystemId, $payVal))
+            return 0; //товар полностью оплачен
+
+        $payVal = explode(',', CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD_CURIER', ''));
+        if (in_array($paySystemId, $payVal))
+            return 1; //необходимо взять деньги за товар
+
+        return $cash;
     }
 
     public static function getOrderProps($orderId)

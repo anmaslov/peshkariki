@@ -43,9 +43,9 @@ $MESS['ANMASLOV_PESHKARIKI_OPT_PROP_CRM_2'] = 'QIWI';
 
 $MESS['ANMASLOV_PESHKARIKI_OPT_RETURN_CONTACTS'] = 'Номер карты, ФИО владельца';
 
-$MESS['ANMASLOV_PESHKARIKI_OPT_PAYMENT_FOR'] = 'Если выбрать платежную систему, то при отгрузке товар будет уже либо с оплатой, либо без';
+$MESS['ANMASLOV_PESHKARIKI_OPT_PAYMENT_FOR'] = 'Если выбрать платежную систему, то курьер либо возьмет деньги за товар либо нет';
 
 $MESS['ANMASLOV_PESHKARIKI_PAYMENT_INTERSECT_ERR'] = 'Нельзя выбирать одну и ту же систему оплаты для разных видов заказов!';
-$MESS['ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_PAYED'] = 'Товар предоплачен';
-$MESS['ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_CURIER'] = 'Оплата производится курьеру';
+$MESS['ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_PAYED'] = 'Товар предоплачен (Не брать деньги за товар)';
+$MESS['ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_CURIER'] = 'Оплата производится курьеру (Брать деньги за товар)';
 $MESS['ANMASLOV_PESHKARIKI_PAYMENT_METHOD_DESCRIPTION'] = 'Если не выбирать платежных систем - будет подставлено указанное значение по умолчанию';
