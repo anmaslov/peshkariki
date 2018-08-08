@@ -6,6 +6,9 @@ class COrderAnmaslovPeshkariki{
 
     const MODULE_ID = 'anmaslov.peshkariki';
 
+    const CASH_PAYED = 0;
+    const CASH_CURIER = 1;
+
     public static function addOrder($id, $arFields)
     {
         $propMakeOrder = CUtilsPeshkariki::getConfig('PROPERTY_MAKE_ORDER', 'N');
@@ -130,7 +133,7 @@ class COrderAnmaslovPeshkariki{
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
             'cash' => $cash, //0-товар предоплачен
-            'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
+            'clearing' => CUtilsPeshkariki::getConfig('PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
             'order_type_id' => 1,
@@ -138,7 +141,7 @@ class COrderAnmaslovPeshkariki{
         );
 
         //если 1 - необходимо забрать оплату наличными
-        if ($cash == 1) {
+        if ($cash == self::CASH_PAYED) {
             $arOrder['ewalletType'] = CUtilsPeshkariki::getConfig('PROPERTY_CACH_RETURN_METHOD');
             $arOrder['ewallet'] = CUtilsPeshkariki::getConfig('PROPERTY_RETURN_CONTACTS');
         }
@@ -153,15 +156,15 @@ class COrderAnmaslovPeshkariki{
      */
     public static function getCashType($paySystemId)
     {
-        $cash = CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD', 0); //Значение по умолчанию
+        $cash = CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD', self::CASH_PAYED); //Значение по умолчанию
         
         $payVal = explode(',', CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD_PAYED', ''));
         if (in_array($paySystemId, $payVal))
-            return 0; //товар полностью оплачен
+            return self::CASH_PAYED; //товар полностью оплачен
 
         $payVal = explode(',', CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD_CURIER', ''));
         if (in_array($paySystemId, $payVal))
-            return 1; //необходимо взять деньги за товар
+            return self::CASH_CURIER; //необходимо взять деньги за товар
 
         return $cash;
     }
