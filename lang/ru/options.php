@@ -31,13 +31,21 @@ $MESS['ANMASLOV_PESHKARIKI_SETTINGS_BUILDING'] = 'Здание';
 $MESS['ANMASLOV_PESHKARIKI_SETTINGS_APARTAMENTS'] = 'Квартира';
 $MESS['ANMASLOV_PESHKARIKI_SETTINGS_TARGET'] = 'Комментарий';
 
-$MESS['ANMASLOV_PESHKARIKI_OPT_PAYMENT_METHOD'] = 'Брать деньги за груз';
+$MESS['ANMASLOV_PESHKARIKI_OPT_PAYMENT_METHOD'] = 'По умолчанию брать деньги за груз';
 $MESS['ANMASLOV_PESHKARIKI_OPT_PROP_PM_0'] = 'Нет';
 $MESS['ANMASLOV_PESHKARIKI_OPT_PROP_PM_1'] = 'Да';
 
 $MESS['ANMASLOV_PESHKARIKI_OPT_CACH_RETURN_METHOD'] = 'Возврат денег';
+$MESS['ANMASLOV_PESHKARIKI_OPT_CACH_RETURN_METHOD_DESC'] = 'Заполнять обязательно, если деньги передаются курьеру!';
 $MESS['ANMASLOV_PESHKARIKI_OPT_PROP_CRM_0'] = 'Карта Сбербанка';
 $MESS['ANMASLOV_PESHKARIKI_OPT_PROP_CRM_1'] = 'Яндекс.Деньги';
 $MESS['ANMASLOV_PESHKARIKI_OPT_PROP_CRM_2'] = 'QIWI';
 
 $MESS['ANMASLOV_PESHKARIKI_OPT_RETURN_CONTACTS'] = 'Номер карты, ФИО владельца';
+
+$MESS['ANMASLOV_PESHKARIKI_OPT_PAYMENT_FOR'] = 'Если выбрать платежную систему, то курьер либо возьмет деньги за товар либо нет';
+
+$MESS['ANMASLOV_PESHKARIKI_PAYMENT_INTERSECT_ERR'] = 'Нельзя выбирать одну и ту же систему оплаты для разных видов заказов!';
+$MESS['ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_PAYED'] = 'Товар предоплачен (Не брать деньги за товар)';
+$MESS['ANMASLOV_PESHKARIKI_PROPERTY_PAYMENT_METHOD_CURIER'] = 'Оплата производится курьеру (Брать деньги за товар)';
+$MESS['ANMASLOV_PESHKARIKI_PAYMENT_METHOD_DESCRIPTION'] = 'Если не выбирать платежных систем - будет подставлено указанное значение по умолчанию';

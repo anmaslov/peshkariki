@@ -6,9 +6,11 @@ class COrderAnmaslovPeshkariki{
 
     const MODULE_ID = 'anmaslov.peshkariki';
 
+    const CASH_PAYED = 0;
+    const CASH_CURIER = 1;
+
     public static function addOrder($id, $arFields)
     {
-
         $propMakeOrder = CUtilsPeshkariki::getConfig('PROPERTY_MAKE_ORDER', 'N');
         $propOrderStatus = CUtilsPeshkariki::getConfig('PROPERTY_ORDER_STATUS', 'F');
 
@@ -32,6 +34,7 @@ class COrderAnmaslovPeshkariki{
             'ORDER_ID' => $id,
             'ORDER' => $arProp,
             'ITEMS' => $arRouteItems,
+            'ORDER_DETAIL' => $arOrder,
         );
 
         $arData = self::prepareData($arPrepare);
@@ -59,7 +62,7 @@ class COrderAnmaslovPeshkariki{
                 array("TRACKING_NUMBER" => $pId)
             );
         }
-
+        
         return $price;
     }
 
@@ -116,7 +119,7 @@ class COrderAnmaslovPeshkariki{
             'time_from' => date('Y-m-d', strtotime('+1 day')) . ' 09:00:00',
             'time_to' => date('Y-m-d', strtotime('+2 day')) . ' 18:00:00',
             'target' => CUtilsPeshkariki::getConfig("PROPERTY_TARGET$cityKey"),
-            'items' => array(),
+            //'items' => array(),
         );
 
         if (strlen($arrFrom['name'].$arrFrom['phone'].$arrFrom['street'].$arrFrom['building']) == 0) {
@@ -124,12 +127,14 @@ class COrderAnmaslovPeshkariki{
             return false;
         }
 
+        $cash = self::getCashType($arData['ORDER_DETAIL']['PAY_SYSTEM_ID']); 
+
         $arOrder = array(
             'inner_id' => $arData['ORDER_ID'],
             'comment' => CUtilsPeshkariki::getConfig('PROPERTY_ORDER_COMMENT'),
             "calculate" => 0,
-            'cash' => CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD'), //0-товар предоплачен
-            'clearing' => COption::GetOptionString(CUtilsPeshkariki::MODULE_ID, 'PROPERTY_CLEARING', 0),
+            'cash' => $cash, //0-товар предоплачен
+            'clearing' => CUtilsPeshkariki::getConfig('PROPERTY_CLEARING', 0),
             'ewalletType' => 0,
             'city_id' => $cityKey,
             'order_type_id' => 1,
@@ -137,12 +142,32 @@ class COrderAnmaslovPeshkariki{
         );
 
         //если 1 - необходимо забрать оплату наличными
-        if (CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD') == 1) {
+        if ($cash == self::CASH_PAYED) {
             $arOrder['ewalletType'] = CUtilsPeshkariki::getConfig('PROPERTY_CACH_RETURN_METHOD');
             $arOrder['ewallet'] = CUtilsPeshkariki::getConfig('PROPERTY_RETURN_CONTACTS');
         }
 
         return $arOrder;
+    }
+
+    /**
+     * Брать деньги за товар
+     * 0 - товар оплачен, денег не брать
+     * 1 - товар не оплачен, брать деньги
+     */
+    public static function getCashType($paySystemId)
+    {
+        $cash = CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD', self::CASH_PAYED); //Значение по умолчанию
+        
+        $payVal = explode(',', CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD_PAYED', ''));
+        if (in_array($paySystemId, $payVal))
+            return self::CASH_PAYED; //товар полностью оплачен
+
+        $payVal = explode(',', CUtilsPeshkariki::getConfig('PROPERTY_PAYMENT_METHOD_CURIER', ''));
+        if (in_array($paySystemId, $payVal))
+            return self::CASH_CURIER; //необходимо взять деньги за товар
+
+        return $cash;
     }
 
     public static function getOrderProps($orderId)
