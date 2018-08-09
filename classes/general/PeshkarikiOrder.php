@@ -119,7 +119,7 @@ class COrderAnmaslovPeshkariki{
             'time_from' => date('Y-m-d', strtotime('+1 day')) . ' 09:00:00',
             'time_to' => date('Y-m-d', strtotime('+2 day')) . ' 18:00:00',
             'target' => CUtilsPeshkariki::getConfig("PROPERTY_TARGET$cityKey"),
-            'items' => array(),
+            //'items' => array(),
         );
 
         if (strlen($arrFrom['name'].$arrFrom['phone'].$arrFrom['street'].$arrFrom['building']) == 0) {
